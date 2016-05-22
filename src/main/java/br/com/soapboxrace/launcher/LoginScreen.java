@@ -35,6 +35,8 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 
 public class LoginScreen extends Shell {
 	private Text txtPassword;
@@ -87,7 +89,19 @@ public class LoginScreen extends Shell {
 		mntmNewSubmenu.setMenu(menu_1);
 
 		MenuItem mntmServerSelect = new MenuItem(menu_1, SWT.NONE);
+		mntmServerSelect.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				Shell a = getShell();
+				ServerSelection dialog = new ServerSelection(a, SWT.DIALOG_TRIM
+				        | SWT.APPLICATION_MODAL);
+				dialog.open();
+			}
+		});
 		mntmServerSelect.setText("Select a server...");
+		
+		MenuItem mntmAutoUpdateServers = new MenuItem(menu_1, SWT.CHECK);
+		mntmAutoUpdateServers.setText("Auto-Update servers on start");
 
 		MenuItem mntmAutoLogin = new MenuItem(menu_1, SWT.CHECK);
 		mntmAutoLogin.setText("Auto-Login on start");
@@ -125,12 +139,12 @@ public class LoginScreen extends Shell {
 		btnLogin.setBounds(194, 64, 56, 25);
 		btnLogin.setText("Login");
 				
-						Label label = new Label(this, SWT.SEPARATOR | SWT.HORIZONTAL | SWT.SHADOW_IN);
-						label.setBounds(0, 228, 444, 2);
+		Label label = new Label(this, SWT.SEPARATOR | SWT.HORIZONTAL | SWT.SHADOW_IN);
+		label.setBounds(0, 228, 444, 2);
 		
-				lblStatus = new Label(this, SWT.NONE);
-				lblStatus.setBounds(5, 232, 439, 15);
-				lblStatus.setText("Status: Idle");
+		lblStatus = new Label(this, SWT.NONE);
+		lblStatus.setBounds(5, 232, 439, 15);
+		lblStatus.setText("Status: Idle");
 	}
 
 	private void doLogin(String email, String password) {
@@ -179,7 +193,7 @@ public class LoginScreen extends Shell {
 			lblStatus.setText("Login Error: Invalid response data.");
 		} catch (IOException e) {
 			e.printStackTrace();
-			lblStatus.setText(String.format("Error: %s.", e.getMessage()));
+			lblStatus.setText(String.format("Error: %s.", e.getCause().getLocalizedMessage()));
 		}
 	}
 
