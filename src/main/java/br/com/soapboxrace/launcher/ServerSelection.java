@@ -26,7 +26,7 @@ import org.eclipse.swt.events.SelectionEvent;
 
 public class ServerSelection extends Dialog {
 
-	protected Object result;
+	protected String result;
 	protected Shell shlServerSelection;
 
 	private List listServer;
@@ -52,7 +52,7 @@ public class ServerSelection extends Dialog {
 	 * 
 	 * @return the result
 	 */
-	public Object open() {
+	public String open() {
 		createContents();
 		downloadServerList(false);
 		shlServerSelection.open();
