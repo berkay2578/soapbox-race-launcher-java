@@ -31,6 +31,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -52,7 +53,7 @@ import br.com.soapboxrace.launcher.variables.UserPreferences;
 public class LoginScreen extends Shell {
 	private Text txtPassword;
 	private Text txtEmail;
-	private Label lblStatus;
+	private CLabel lblStatus;
 
 	private String userId = null;
 	private String loginToken = null;
@@ -186,11 +187,9 @@ public class LoginScreen extends Shell {
 		btnLogin.setBounds(194, 64, 56, 25);
 		btnLogin.setText("Login");
 
-		Label label = new Label(this, SWT.SEPARATOR | SWT.HORIZONTAL | SWT.SHADOW_IN);
-		label.setBounds(0, 228, 444, 2);
-
-		lblStatus = new Label(this, SWT.BORDER);
-		lblStatus.setBounds(0, 232, 444, 19);
+		lblStatus = new CLabel(this, SWT.BORDER | SWT.SHADOW_IN);
+		lblStatus.setLeftMargin(5);
+		lblStatus.setBounds(0, 228, 444, 23);
 		lblStatus.setText("Status: Idle");
 	}
 

@@ -29,7 +29,7 @@ public class ServerSelection extends Dialog {
 	protected Shell shlServerSelection;
 
 	private List listServer;
-	private Label lblStatus;
+	private CLabel lblStatus;
 	private Button btnSelect;
 
 	private String dirServerList = "launcher/";
@@ -99,7 +99,7 @@ public class ServerSelection extends Dialog {
 	 */
 	private void createContents() {
 		shlServerSelection = new Shell(getParent(), getStyle());
-		shlServerSelection.setSize(441, 275);
+		shlServerSelection.setSize(441, 283);
 		shlServerSelection.setText("Server Selection");
 		shlServerSelection.setLayout(null);
 
@@ -112,13 +112,11 @@ public class ServerSelection extends Dialog {
 			}
 		});
 		listServer.setItems(new String[] {});
-		listServer.setBounds(3, 6, 231, 215);
+		listServer.setBounds(3, 6, 231, 218);
 
-		Label label = new Label(shlServerSelection, SWT.SEPARATOR | SWT.HORIZONTAL | SWT.SHADOW_IN);
-		label.setBounds(-4, 227, 439, 4);
-
-		lblStatus = new Label(shlServerSelection, SWT.NONE);
-		lblStatus.setBounds(2, 230, 433, 15);
+		lblStatus = new CLabel(shlServerSelection, SWT.BORDER | SWT.SHADOW_IN);
+		lblStatus.setLeftMargin(5);
+		lblStatus.setBounds(0, 233, 435, 21);
 		lblStatus.setText("Status: Idle");
 
 		Canvas canvasServerImage = new Canvas(shlServerSelection, SWT.BORDER);
