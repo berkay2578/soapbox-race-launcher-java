@@ -1,4 +1,4 @@
-package br.com.soapboxrace.launcher;
+package br.com.soapboxrace.launcher.forms;
 
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.util.Arrays;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Label;

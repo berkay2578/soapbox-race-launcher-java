@@ -1,4 +1,4 @@
-package br.com.soapboxrace.launcher;
+package br.com.soapboxrace.launcher.forms;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -43,6 +43,8 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import br.com.soapboxrace.launcher.variables.UserPreferences;
+
 import org.apache.commons.codec.digest.DigestUtils;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -52,9 +54,8 @@ public class LoginScreen extends Shell {
 	private Text txtEmail;
 	private Label lblStatus;
 
-	private String userId;
-	private String loginToken;
-	private String serverURL;
+	private String userId = null;
+	private String loginToken = null;
 	
 	private String dirLauncherSettings = "launcher/";
 	private String fileLauncherSettings = "settings.xml";
@@ -106,17 +107,18 @@ public class LoginScreen extends Shell {
 			public void widgetSelected(SelectionEvent arg0) {
 				Shell a = getShell();
 				ServerSelection dialog = new ServerSelection(a, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-				serverURL = dialog.open();
-				setServerURL(serverURL);
+				setServerURL(dialog.open());
 			}
 		});
 		mntmServerSelect.setText("Select a server...");
 		
 		MenuItem mntmAutoUpdateServers = new MenuItem(menu_1, SWT.CHECK);
 		mntmAutoUpdateServers.setText("Auto-Update servers on start");
+		mntmAutoUpdateServers.setSelection(UserPreferences.AutoUpdateServers);
 
 		MenuItem mntmAutoLogin = new MenuItem(menu_1, SWT.CHECK);
 		mntmAutoLogin.setText("Auto-Login on start");
+		mntmAutoLogin.setSelection(UserPreferences.AutoLogin);
 
 		MenuItem mntmAbout = new MenuItem(menu, SWT.NONE);
 		mntmAbout.setText("About");
@@ -154,8 +156,8 @@ public class LoginScreen extends Shell {
 		Label label = new Label(this, SWT.SEPARATOR | SWT.HORIZONTAL | SWT.SHADOW_IN);
 		label.setBounds(0, 228, 444, 2);
 		
-		lblStatus = new Label(this, SWT.NONE);
-		lblStatus.setBounds(5, 232, 439, 15);
+		lblStatus = new Label(this, SWT.BORDER);
+		lblStatus.setBounds(0, 232, 444, 19);
 		lblStatus.setText("Status: Idle");
 		
 		readSettings();
@@ -188,8 +190,12 @@ public class LoginScreen extends Shell {
 			DocumentBuilder dcBuilder = dcFactory.newDocumentBuilder();
 			Document doc = dcBuilder.parse(settings);
 			doc.getDocumentElement().normalize();
-			
-			serverURL = doc.getElementsByTagName("URL").item(0).getTextContent();			
+
+			Boolean autoLogin = Boolean.valueOf(doc.getElementsByTagName("AutoLogin").item(0).getTextContent());
+			Boolean autoUpdateServers = Boolean.valueOf(doc.getElementsByTagName("AutoUpdateServers").item(0).getTextContent());
+			Boolean keepServerCache = Boolean.valueOf(doc.getElementsByTagName("KeepServerCache").item(0).getTextContent());
+			String serverURL = doc.getElementsByTagName("URL").item(0).getTextContent();
+			UserPreferences.init(autoLogin, autoUpdateServers, keepServerCache, serverURL);
 		} catch (ParserConfigurationException | SAXException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -199,6 +205,8 @@ public class LoginScreen extends Shell {
 	
 	private void setServerURL(String serverURL) {		
 		try {
+			UserPreferences.ServerURL = serverURL;
+			
 			File settings = new File(dirLauncherSettings.concat(fileLauncherSettings));
 			DocumentBuilderFactory dcFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dcBuilder = dcFactory.newDocumentBuilder();
@@ -224,6 +232,9 @@ public class LoginScreen extends Shell {
 	
 	private void doLogin(String email, String password) {
 		try {
+			userId = null;
+			loginToken = null;
+			
 			DocumentBuilderFactory dcFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dcBuilder = dcFactory.newDocumentBuilder();
 
@@ -231,7 +242,7 @@ public class LoginScreen extends Shell {
 					URLEncoder.encode(email, StandardCharsets.UTF_8.toString()),
 					URLEncoder.encode(password, StandardCharsets.UTF_8.toString()));
 
-			URL serverAuth = new URL(serverURL.concat("/nfsw/Engine.svc/User/AuthenticateUser?").concat(param));
+			URL serverAuth = new URL(UserPreferences.ServerURL.concat("/nfsw/Engine.svc/User/AuthenticateUser?").concat(param));
 			HttpURLConnection serverCon = (HttpURLConnection) serverAuth.openConnection();
 			serverCon.setRequestMethod("GET");
 
