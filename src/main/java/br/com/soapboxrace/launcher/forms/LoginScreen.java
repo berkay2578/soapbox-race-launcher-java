@@ -102,6 +102,7 @@ public class LoginScreen extends Shell {
 		mntmSettings.setMenu(menu_1);
 
 		MenuItem mntmServerSelect = new MenuItem(menu_1, SWT.NONE);
+		mntmServerSelect.setToolTipText("Change your current server with another one");
 		mntmServerSelect.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
@@ -113,13 +114,16 @@ public class LoginScreen extends Shell {
 		mntmServerSelect.setText("Select a server...");
 		
 		MenuItem mntmKeepServerCache = new MenuItem(menu_1, SWT.CHECK);
+		mntmKeepServerCache.setToolTipText("When server data is retrieved, keep them for later use\r\n(Note: this will cause old data to be shown unless manually refreshed in the launcher)\r\n(Note-2: disabling this will also delete your current saved server data cache)");
 		mntmKeepServerCache.setText("Keep server cache");
 		
 		MenuItem mntmAutoUpdateServers = new MenuItem(menu_1, SWT.CHECK);
+		mntmAutoUpdateServers.setToolTipText("Whether should the launcher auto-retrieve latest list of servers and also download their latest data\r\n(Note: do not check this if your PC or your internet is slow)");
 		mntmAutoUpdateServers.setText("Auto-Update servers on start");
 		mntmAutoUpdateServers.setSelection(UserPreferences.AutoUpdateServers);
 
 		MenuItem mntmAutoLogin = new MenuItem(menu_1, SWT.CHECK);
+		mntmAutoLogin.setToolTipText("Whether should the launcher auto-log you in to the current server");
 		mntmAutoLogin.setText("Auto-Login on start");
 		mntmAutoLogin.setSelection(UserPreferences.AutoLogin);
 
