@@ -12,6 +12,7 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -28,9 +29,12 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -45,10 +49,6 @@ import org.xml.sax.SAXException;
 
 import br.com.soapboxrace.launcher.variables.UserPreferences;
 
-import org.apache.commons.codec.digest.DigestUtils;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-
 public class LoginScreen extends Shell {
 	private Text txtPassword;
 	private Text txtEmail;
@@ -56,7 +56,7 @@ public class LoginScreen extends Shell {
 
 	private String userId = null;
 	private String loginToken = null;
-	
+
 	private String dirLauncherSettings = "launcher/";
 	private String fileLauncherSettings = "settings.xml";
 
@@ -91,6 +91,7 @@ public class LoginScreen extends Shell {
 		setText("Soapbox-Hill | server launcher");
 		setSize(450, 300);
 		setLayout(null);
+		readSettings();
 
 		Menu menu = new Menu(this, SWT.BAR);
 		setMenuBar(menu);
@@ -108,33 +109,45 @@ public class LoginScreen extends Shell {
 			public void widgetSelected(SelectionEvent arg0) {
 				Shell a = getShell();
 				ServerSelection dialog = new ServerSelection(a, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-				setServerURL(dialog.open());
+				UserPreferences.ServerURL = dialog.open();
+				saveSettings();
 			}
 		});
 		mntmServerSelect.setText("Select a server...");
-		
+
 		MenuItem mntmKeepServerCache = new MenuItem(menu_1, SWT.CHECK);
 		mntmKeepServerCache.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent arg0) { UserPreferences.KeepServerCache = mntmKeepServerCache.getSelection(); }
+			public void widgetSelected(SelectionEvent arg0) {
+				UserPreferences.KeepServerCache = mntmKeepServerCache.getSelection();
+				saveSettings();
+			}
 		});
-		mntmKeepServerCache.setToolTipText("When server data is retrieved, keep them for later use\r\n(Note: this will cause old data to be shown unless manually refreshed in the launcher)\r\n(Note-2: disabling this will also delete your current saved server data cache)");
+		mntmKeepServerCache.setToolTipText(
+				"When server data is retrieved, keep them for later use\r\n(Note: this will cause old data to be shown unless manually refreshed in the launcher)\r\n(Note-2: disabling this will also delete your current saved server data cache)");
 		mntmKeepServerCache.setText("Keep server cache");
 		mntmKeepServerCache.setSelection(UserPreferences.KeepServerCache);
-		
+
 		MenuItem mntmAutoUpdateServers = new MenuItem(menu_1, SWT.CHECK);
 		mntmAutoUpdateServers.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent arg0) { UserPreferences.AutoUpdateServers = mntmAutoUpdateServers.getSelection(); }
+			public void widgetSelected(SelectionEvent arg0) {
+				UserPreferences.AutoUpdateServers = mntmAutoUpdateServers.getSelection();
+				saveSettings();
+			}
 		});
-		mntmAutoUpdateServers.setToolTipText("Whether should the launcher auto-retrieve latest list of servers and also download their latest data\r\n(Note: do not check this if your PC or your internet is slow)");
+		mntmAutoUpdateServers.setToolTipText(
+				"Whether should the launcher auto-retrieve latest list of servers and also download their latest data\r\n(Note: do not check this if your PC or your internet is slow)");
 		mntmAutoUpdateServers.setText("Auto-Update servers on start");
 		mntmAutoUpdateServers.setSelection(UserPreferences.AutoUpdateServers);
 
 		MenuItem mntmAutoLogin = new MenuItem(menu_1, SWT.CHECK);
 		mntmAutoLogin.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent arg0) { UserPreferences.AutoLogin = mntmAutoLogin.getSelection(); }
+			public void widgetSelected(SelectionEvent arg0) {
+				UserPreferences.AutoLogin = mntmAutoLogin.getSelection();
+				saveSettings();
+			}
 		});
 		mntmAutoLogin.setToolTipText("Whether should the launcher auto-log you in to the current server");
 		mntmAutoLogin.setText("Auto-Login on start");
@@ -172,48 +185,38 @@ public class LoginScreen extends Shell {
 		});
 		btnLogin.setBounds(194, 64, 56, 25);
 		btnLogin.setText("Login");
-				
+
 		Label label = new Label(this, SWT.SEPARATOR | SWT.HORIZONTAL | SWT.SHADOW_IN);
 		label.setBounds(0, 228, 444, 2);
-		
+
 		lblStatus = new Label(this, SWT.BORDER);
 		lblStatus.setBounds(0, 232, 444, 19);
 		lblStatus.setText("Status: Idle");
-		
-		readSettings();
 	}
 
 	private void readSettings() {
 		try {
 			File settings = new File(dirLauncherSettings.concat(fileLauncherSettings));
 			if (settings.createNewFile()) {
-				List<String> defaultSettings = Arrays.asList(
-						"<LauncherSettings>",
-						"	<Server>",
-						"		<URL>http://localhost:1337</URL>",
-						"	</Server>",
-						"	<Preferences>",
-						"		<AutoLogin>false</AutoLogin>",
-						"		<AutoUpdateServers>false</AutoUpdateServers>",
-						"		<KeepServerCache>true</KeepServerCache>",
-						"	</Preferences>",
-						"	<LoginData>",
-						"		<Email/>",
-						"		<Password/>",
-						"	</LoginData>",
-						"</LauncherSettings>"
-						);
-				Files.write(Paths.get(dirLauncherSettings.concat(fileLauncherSettings)), defaultSettings, StandardCharsets.UTF_8);
+				List<String> defaultSettings = Arrays.asList("<LauncherSettings>", "	<Server>",
+						"		<URL>http://localhost:1337</URL>", "	</Server>", "	<Preferences>",
+						"		<AutoLogin>false</AutoLogin>", "		<AutoUpdateServers>false</AutoUpdateServers>",
+						"		<KeepServerCache>true</KeepServerCache>", "	</Preferences>", "	<LoginData>",
+						"		<Email/>", "		<Password/>", "	</LoginData>", "</LauncherSettings>");
+				Files.write(Paths.get(dirLauncherSettings.concat(fileLauncherSettings)), defaultSettings,
+						StandardCharsets.UTF_8);
 			}
-			
+
 			DocumentBuilderFactory dcFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dcBuilder = dcFactory.newDocumentBuilder();
 			Document doc = dcBuilder.parse(settings);
 			doc.getDocumentElement().normalize();
 
 			Boolean autoLogin = Boolean.valueOf(doc.getElementsByTagName("AutoLogin").item(0).getTextContent());
-			Boolean autoUpdateServers = Boolean.valueOf(doc.getElementsByTagName("AutoUpdateServers").item(0).getTextContent());
-			Boolean keepServerCache = Boolean.valueOf(doc.getElementsByTagName("KeepServerCache").item(0).getTextContent());
+			Boolean autoUpdateServers = Boolean
+					.valueOf(doc.getElementsByTagName("AutoUpdateServers").item(0).getTextContent());
+			Boolean keepServerCache = Boolean
+					.valueOf(doc.getElementsByTagName("KeepServerCache").item(0).getTextContent());
 			String serverURL = doc.getElementsByTagName("URL").item(0).getTextContent();
 			UserPreferences.init(autoLogin, autoUpdateServers, keepServerCache, serverURL);
 		} catch (ParserConfigurationException | SAXException e) {
@@ -222,18 +225,31 @@ public class LoginScreen extends Shell {
 			e.printStackTrace();
 		}
 	}
-	
-	private void setServerURL(String serverURL) {		
+
+	private void saveSettings() {
 		try {
-			UserPreferences.ServerURL = serverURL;
-			
 			File settings = new File(dirLauncherSettings.concat(fileLauncherSettings));
+			if (settings.createNewFile()) {
+				List<String> defaultSettings = Arrays.asList("<LauncherSettings>", "	<Server>",
+						"		<URL>http://localhost:1337</URL>", "	</Server>", "	<Preferences>",
+						"		<AutoLogin>false</AutoLogin>", "		<AutoUpdateServers>false</AutoUpdateServers>",
+						"		<KeepServerCache>true</KeepServerCache>", "	</Preferences>", "	<LoginData>",
+						"		<Email/>", "		<Password/>", "	</LoginData>", "</LauncherSettings>");
+				Files.write(Paths.get(dirLauncherSettings.concat(fileLauncherSettings)), defaultSettings,
+						StandardCharsets.UTF_8);
+			}
+
 			DocumentBuilderFactory dcFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dcBuilder = dcFactory.newDocumentBuilder();
 			Document doc = dcBuilder.parse(settings);
 			doc.getDocumentElement().normalize();
-			
-			doc.getElementsByTagName("URL").item(0).setTextContent(serverURL);
+
+			doc.getElementsByTagName("AutoLogin").item(0).setTextContent(String.valueOf(UserPreferences.AutoLogin));
+			doc.getElementsByTagName("AutoUpdateServers").item(0)
+					.setTextContent(String.valueOf(UserPreferences.AutoUpdateServers));
+			doc.getElementsByTagName("KeepServerCache").item(0)
+					.setTextContent(String.valueOf(UserPreferences.KeepServerCache));
+			doc.getElementsByTagName("URL").item(0).setTextContent(UserPreferences.ServerURL);
 
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
@@ -249,12 +265,12 @@ public class LoginScreen extends Shell {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void doLogin(String email, String password) {
 		try {
 			userId = null;
 			loginToken = null;
-			
+
 			DocumentBuilderFactory dcFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dcBuilder = dcFactory.newDocumentBuilder();
 
@@ -262,7 +278,8 @@ public class LoginScreen extends Shell {
 					URLEncoder.encode(email, StandardCharsets.UTF_8.toString()),
 					URLEncoder.encode(password, StandardCharsets.UTF_8.toString()));
 
-			URL serverAuth = new URL(UserPreferences.ServerURL.concat("/nfsw/Engine.svc/User/AuthenticateUser?").concat(param));
+			URL serverAuth = new URL(
+					UserPreferences.ServerURL.concat("/nfsw/Engine.svc/User/AuthenticateUser?").concat(param));
 			HttpURLConnection serverCon = (HttpURLConnection) serverAuth.openConnection();
 			serverCon.setRequestMethod("GET");
 
@@ -294,6 +311,8 @@ public class LoginScreen extends Shell {
 			lblStatus.setText("Connection Error: Couldn't connect to the server.");
 		} catch (ProtocolException e) {
 			lblStatus.setText("Connection Error: Couldn't setup GET request.");
+		} catch (UnknownHostException e) {
+			lblStatus.setText("Connection Error: Current server doesn't exist.");
 		} catch (SAXException | ParserConfigurationException e) {
 			lblStatus.setText("Login Error: Invalid response data.");
 		} catch (IOException e) {
