@@ -31,13 +31,17 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
@@ -49,11 +53,16 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import br.com.soapboxrace.launcher.variables.UserPreferences;
+import org.eclipse.wb.swt.SWTResourceManager;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
 
 public class LoginScreen extends Shell {
 	private Text txtPassword;
 	private Text txtEmail;
 	private CLabel lblStatus;
+	private Composite compositeEntrance;
+	private Composite compositeNfsw;
 
 	private String userId = null;
 	private String loginToken = null;
@@ -89,8 +98,14 @@ public class LoginScreen extends Shell {
 	 */
 	public LoginScreen(Display display) {
 		super(display, SWT.CLOSE | SWT.MIN | SWT.TITLE);
+		addShellListener(new ShellAdapter() {
+			@Override
+			public void shellClosed(ShellEvent arg0) {
+				SWTResourceManager.dispose();
+			}
+		});
 		setText("Soapbox-Hill | server launcher");
-		setSize(450, 300);
+		setSize(450, 363);
 		setLayout(null);
 		readSettings();
 
@@ -157,40 +172,81 @@ public class LoginScreen extends Shell {
 		MenuItem mntmAbout = new MenuItem(menu, SWT.NONE);
 		mntmAbout.setText("About");
 
-		Composite composite = new Composite(this, SWT.NONE);
-		composite.setBounds(0, 10, 260, 99);
-		composite.setLayout(null);
+		compositeEntrance = new Composite(this, SWT.NONE);
+		compositeEntrance.setBounds(51, 10, 327, 129);
+		compositeEntrance.setLayout(null);
+		
+		CLabel lblStep1 = new CLabel(compositeEntrance, SWT.NONE);
+		lblStep1.setLocation(0, 6);
+		lblStep1.setSize(291, 30);
+		lblStep1.setText("Step 1.");
+		lblStep1.setFont(new Font(lblStep1.getDisplay(), new FontData("Segoe UI Semibold", 16, SWT.NONE)));
 
-		Label lblEmail = new Label(composite, SWT.NONE);
-		lblEmail.setBounds(22, 13, 35, 15);
+		Label lblEmail = new Label(compositeEntrance, SWT.NONE);
+		lblEmail.setBounds(24, 41, 35, 15);
 		lblEmail.setText("Email: ");
 
-		Label lblPassword = new Label(composite, SWT.NONE);
-		lblPassword.setBounds(22, 40, 56, 15);
+		Label lblPassword = new Label(compositeEntrance, SWT.NONE);
+		lblPassword.setBounds(24, 68, 56, 15);
 		lblPassword.setText("Password: ");
 
-		txtEmail = new Text(composite, SWT.BORDER);
-		txtEmail.setBounds(90, 10, 160, 21);
+		txtEmail = new Text(compositeEntrance, SWT.BORDER);
+		txtEmail.setBounds(92, 38, 199, 21);
 		txtEmail.setTextLimit(254);
 
-		txtPassword = new Text(composite, SWT.BORDER | SWT.PASSWORD);
-		txtPassword.setBounds(90, 37, 160, 21);
+		txtPassword = new Text(compositeEntrance, SWT.BORDER | SWT.PASSWORD);
+		txtPassword.setBounds(92, 65, 199, 21);
 		txtPassword.setTextLimit(64);
 
-		Button btnLogin = new Button(composite, SWT.NONE);
+		Button btnLogin = new Button(compositeEntrance, SWT.NONE);
 		btnLogin.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent arg0) {
-				doLogin(txtEmail.getText(), DigestUtils.sha1Hex(txtPassword.getText()));
+				BusyIndicator.showWhile(Display.getDefault(), new Runnable()
+				{
+				    public void run()
+				    {
+						doLogin(txtEmail.getText(), DigestUtils.sha1Hex(txtPassword.getText()));
+				    }
+				});
 			}
 		});
-		btnLogin.setBounds(194, 64, 56, 25);
+		btnLogin.setBounds(123, 92, 56, 25);
 		btnLogin.setText("Login");
+		
+		Label lbl1 = new Label(compositeEntrance, SWT.NONE);
+		lbl1.setBounds(183, 97, 26, 15);
+		lbl1.setText("- or");
+		
+		Button btnRegister = new Button(compositeEntrance, SWT.NONE);
+		btnRegister.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent arg0) {
+				BusyIndicator.showWhile(Display.getDefault(), new Runnable()
+				{
+				    public void run()
+				    {
+						doRegister(txtEmail.getText(), DigestUtils.sha1Hex(txtPassword.getText()));
+				    }
+				});
+				}
+			});
+		btnRegister.setBounds(215, 92, 76, 25);
+		btnRegister.setText("Register");
 
 		lblStatus = new CLabel(this, SWT.BORDER | SWT.SHADOW_IN);
 		lblStatus.setLeftMargin(5);
-		lblStatus.setBounds(0, 228, 444, 23);
+		lblStatus.setBounds(0, 291, 444, 23);
 		lblStatus.setText("Status: Idle");
+		
+		compositeNfsw = new Composite(this, SWT.NONE);
+		compositeNfsw.setEnabled(false);
+		compositeNfsw.setBounds(51, 145, 327, 129);
+		
+		CLabel lblStep2 = new CLabel(compositeNfsw, SWT.NONE);
+		lblStep2.setText("Step 2.");
+		lblStep2.setFont(SWTResourceManager.getFont("Segoe UI Semibold", 16, SWT.NORMAL));
+		lblStep2.setBounds(0, 6, 291, 30);
 	}
 
 	private void readSettings() {
@@ -267,6 +323,8 @@ public class LoginScreen extends Shell {
 
 	private void doLogin(String email, String password) {
 		try {
+			lblStatus.setText("Status: Logging in...");
+			setEnabled(compositeEntrance, false);
 			userId = null;
 			loginToken = null;
 
@@ -298,6 +356,67 @@ public class LoginScreen extends Shell {
 				userId = doc.getElementsByTagName("UserId").item(0).getTextContent();
 				loginToken = doc.getElementsByTagName("LoginToken").item(0).getTextContent();
 				lblStatus.setText("Status: Logged in!");
+				setEnabled(compositeNfsw, true);
+				return;
+			} else {
+				lblStatus.setText(doc.getElementsByTagName("Message").item(0).getTextContent());
+			}
+		} catch (UnsupportedEncodingException e) {
+			lblStatus.setText("Environment Error: Couldn't encode URL to UTF-8.");
+		} catch (MalformedURLException e) {
+			lblStatus.setText("Connection Error: Server URL is malformed.");
+		} catch (ConnectException e) {
+			lblStatus.setText("Connection Error: Couldn't connect to the server.");
+		} catch (ProtocolException e) {
+			lblStatus.setText("Connection Error: Couldn't setup GET request.");
+		} catch (UnknownHostException e) {
+			lblStatus.setText("Connection Error: Current server isn't running.");
+		} catch (SAXException | ParserConfigurationException e) {
+			lblStatus.setText("Login Error: Invalid response data.");
+		} catch (IOException e) {
+			e.printStackTrace();
+			lblStatus.setText(String.format("Error: %s.", e.getCause().getLocalizedMessage()));
+		}
+		setEnabled(compositeEntrance, true);
+	}
+	
+	private void doRegister(String email, String password) {
+		try {
+			lblStatus.setText("Status: Registering email ".concat(txtEmail.getText()));
+			setEnabled(compositeEntrance, false);
+			userId = null;
+			loginToken = null;
+
+			DocumentBuilderFactory dcFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dcBuilder = dcFactory.newDocumentBuilder();
+
+			String param = String.format("email=%s&password=%s",
+					URLEncoder.encode(email, StandardCharsets.UTF_8.toString()),
+					URLEncoder.encode(password, StandardCharsets.UTF_8.toString()));
+
+			URL serverAuth = new URL(
+					UserPreferences.ServerURL.concat("/nfsw/Engine.svc/User/CreateUser?").concat(param));
+			HttpURLConnection serverCon = (HttpURLConnection) serverAuth.openConnection();
+			serverCon.setRequestMethod("GET");
+
+			BufferedReader in = new BufferedReader(new InputStreamReader(
+					serverCon.getResponseCode() == 200 ? serverCon.getInputStream() : serverCon.getErrorStream()));
+			String inputLine;
+			StringBuffer response = new StringBuffer();
+
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
+
+			Document doc = dcBuilder.parse(new InputSource(new StringReader(response.toString())));
+
+			if (serverCon.getResponseCode() == 200) {
+				userId = doc.getElementsByTagName("UserId").item(0).getTextContent();
+				loginToken = doc.getElementsByTagName("LoginToken").item(0).getTextContent();
+				lblStatus.setText("Status: Registered and logged in!");
+				setEnabled(compositeNfsw, true);
+				return;
 			} else {
 				lblStatus.setText(doc.getElementsByTagName("Message").item(0).getTextContent());
 			}
@@ -311,13 +430,25 @@ public class LoginScreen extends Shell {
 		} catch (ProtocolException e) {
 			lblStatus.setText("Connection Error: Couldn't setup GET request.");
 		} catch (UnknownHostException e) {
-			lblStatus.setText("Connection Error: Current server doesn't exist.");
+			lblStatus.setText("Connection Error: Current server isn't running.");
 		} catch (SAXException | ParserConfigurationException e) {
 			lblStatus.setText("Login Error: Invalid response data.");
 		} catch (IOException e) {
 			e.printStackTrace();
 			lblStatus.setText(String.format("Error: %s.", e.getCause().getLocalizedMessage()));
 		}
+		setEnabled(compositeEntrance, true);
+	}
+	
+	private void setEnabled(Control control, boolean boolTrue) {
+	    if (control instanceof Composite)
+	    {
+	        Composite composite = (Composite) control;
+	        for (Control ctrl : composite.getChildren())
+	            setEnabled(ctrl, boolTrue);
+	    }
+	    else
+	        control.setEnabled(boolTrue);
 	}
 
 	@Override
