@@ -95,11 +95,11 @@ public class LoginScreen extends Shell {
 		Menu menu = new Menu(this, SWT.BAR);
 		setMenuBar(menu);
 
-		MenuItem mntmNewSubmenu = new MenuItem(menu, SWT.CASCADE);
-		mntmNewSubmenu.setText("Settings");
+		MenuItem mntmSettings = new MenuItem(menu, SWT.CASCADE);
+		mntmSettings.setText("Settings");
 
-		Menu menu_1 = new Menu(mntmNewSubmenu);
-		mntmNewSubmenu.setMenu(menu_1);
+		Menu menu_1 = new Menu(mntmSettings);
+		mntmSettings.setMenu(menu_1);
 
 		MenuItem mntmServerSelect = new MenuItem(menu_1, SWT.NONE);
 		mntmServerSelect.addSelectionListener(new SelectionAdapter() {
@@ -111,6 +111,9 @@ public class LoginScreen extends Shell {
 			}
 		});
 		mntmServerSelect.setText("Select a server...");
+		
+		MenuItem mntmKeepServerCache = new MenuItem(menu_1, SWT.CHECK);
+		mntmKeepServerCache.setText("Keep server cache");
 		
 		MenuItem mntmAutoUpdateServers = new MenuItem(menu_1, SWT.CHECK);
 		mntmAutoUpdateServers.setText("Auto-Update servers on start");
