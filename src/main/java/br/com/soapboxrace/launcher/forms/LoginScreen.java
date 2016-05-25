@@ -62,6 +62,8 @@ public class LoginScreen extends Shell {
 	private Text txtPassword;
 	private Text txtEmail;
 	private CLabel lblStatus;
+	private CLabel lblServerURL;
+	private CLabel lblHttpPort;
 	private Composite compositeEntrance;
 	private Composite compositeNfsw;
 
@@ -128,6 +130,8 @@ public class LoginScreen extends Shell {
 				ServerSelection dialog = new ServerSelection(a, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 				UserPreferences.ServerURL = dialog.open();
 				saveSettings();
+				lblServerURL.setText(UserPreferences.ServerURL.replace("http://", ""));
+				lblHttpPort.setText(UserPreferences.ServerPort);
 			}
 		});
 		mntmServerSelect.setText("Select a server...");
@@ -256,31 +260,39 @@ public class LoginScreen extends Shell {
 		
 		Group grpServerDetails = new Group(this, SWT.NONE);
 		grpServerDetails.setText("Current Server Details");
-		grpServerDetails.setBounds(319, 10, 162, 129);
+		grpServerDetails.setBounds(319, 10, 162, 122);
 		
 		Label lbl3 = new Label(grpServerDetails, SWT.NONE);
 		lbl3.setBounds(10, 23, 27, 15);
 		lbl3.setText("URL: ");
 		
-		CLabel lblServerURL = new CLabel(grpServerDetails, SWT.BORDER);
+		lblServerURL = new CLabel(grpServerDetails, SWT.BORDER);
 		lblServerURL.setBounds(40, 20, 112, 21);
-		lblServerURL.setText(UserPreferences.ServerURL);
+		lblServerURL.setText(UserPreferences.ServerURL.replace("http://", ""));
 		
 		Label lbl4 = new Label(grpServerDetails, SWT.NONE);
 		lbl4.setText("Active Players: ");
-		lbl4.setBounds(10, 48, 79, 15);
+		lbl4.setBounds(10, 71, 79, 15);
 		
 		CLabel lblServerActiveSessions = new CLabel(grpServerDetails, SWT.BORDER);
 		lblServerActiveSessions.setText((String) null);
-		lblServerActiveSessions.setBounds(95, 45, 57, 21);
+		lblServerActiveSessions.setBounds(95, 68, 57, 21);
 		
 		Label lbl5 = new Label(grpServerDetails, SWT.NONE);
 		lbl5.setText("Total Players: ");
-		lbl5.setBounds(10, 72, 79, 15);
+		lbl5.setBounds(10, 95, 79, 15);
 		
 		CLabel lblServerTotalPlayers = new CLabel(grpServerDetails, SWT.BORDER);
 		lblServerTotalPlayers.setText((String) null);
-		lblServerTotalPlayers.setBounds(95, 69, 57, 21);
+		lblServerTotalPlayers.setBounds(95, 92, 57, 21);
+		
+		Label lbl6 = new Label(grpServerDetails, SWT.NONE);
+		lbl6.setText("HTTP Port: ");
+		lbl6.setBounds(10, 47, 62, 15);
+		
+		lblHttpPort = new CLabel(grpServerDetails, SWT.BORDER);
+		lblHttpPort.setText(UserPreferences.ServerPort);
+		lblHttpPort.setBounds(78, 44, 74, 21);
 	}
 
 	private void readSettings() {
@@ -306,8 +318,10 @@ public class LoginScreen extends Shell {
 					.valueOf(doc.getElementsByTagName("AutoUpdateServers").item(0).getTextContent());
 			Boolean keepServerCache = Boolean
 					.valueOf(doc.getElementsByTagName("KeepServerCache").item(0).getTextContent());
-			String serverURL = doc.getElementsByTagName("URL").item(0).getTextContent();
-			UserPreferences.init(autoLogin, autoUpdateServers, keepServerCache, serverURL);
+			String[] server = doc.getElementsByTagName("URL").item(0).getTextContent().split(":");
+			String serverURL = (server[0].startsWith("http") ? server[0].concat(":").concat(server[1]) : server[0]);
+			String serverPort = (server[0].startsWith("http") ? server[2] : server[1]);
+			UserPreferences.init(autoLogin, autoUpdateServers, keepServerCache, serverURL, serverPort);
 		} catch (ParserConfigurationException | SAXException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -369,8 +383,7 @@ public class LoginScreen extends Shell {
 					URLEncoder.encode(email, StandardCharsets.UTF_8.toString()),
 					URLEncoder.encode(password, StandardCharsets.UTF_8.toString()));
 
-			URL serverAuth = new URL(
-					UserPreferences.ServerURL.concat("/nfsw/Engine.svc/User/AuthenticateUser?").concat(param));
+			URL serverAuth = new URL(String.format("%s:%s/nfsw/Engine.svc/User/AuthenticateUser?%s", UserPreferences.ServerURL, UserPreferences.ServerPort, param));
 			HttpURLConnection serverCon = (HttpURLConnection) serverAuth.openConnection();
 			serverCon.setRequestMethod("GET");
 
@@ -428,8 +441,7 @@ public class LoginScreen extends Shell {
 					URLEncoder.encode(email, StandardCharsets.UTF_8.toString()),
 					URLEncoder.encode(password, StandardCharsets.UTF_8.toString()));
 
-			URL serverAuth = new URL(
-					UserPreferences.ServerURL.concat("/nfsw/Engine.svc/User/CreateUser?").concat(param));
+			URL serverAuth = new URL(String.format("%s:%s/nfsw/Engine.svc/User/CreateUser?%s", UserPreferences.ServerURL, UserPreferences.ServerPort, param));
 			HttpURLConnection serverCon = (HttpURLConnection) serverAuth.openConnection();
 			serverCon.setRequestMethod("GET");
 
