@@ -56,6 +56,7 @@ import br.com.soapboxrace.launcher.variables.UserPreferences;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.widgets.Group;
 
 public class LoginScreen extends Shell {
 	private Text txtPassword;
@@ -105,7 +106,7 @@ public class LoginScreen extends Shell {
 			}
 		});
 		setText("Soapbox-Hill | server launcher");
-		setSize(450, 363);
+		setSize(497, 363);
 		setLayout(null);
 		readSettings();
 
@@ -173,12 +174,12 @@ public class LoginScreen extends Shell {
 		mntmAbout.setText("About");
 
 		compositeEntrance = new Composite(this, SWT.NONE);
-		compositeEntrance.setBounds(51, 10, 327, 129);
+		compositeEntrance.setBounds(9, 10, 304, 129);
 		compositeEntrance.setLayout(null);
 		
 		CLabel lblStep1 = new CLabel(compositeEntrance, SWT.NONE);
 		lblStep1.setLocation(0, 6);
-		lblStep1.setSize(291, 30);
+		lblStep1.setSize(67, 30);
 		lblStep1.setText("Step 1.");
 		lblStep1.setFont(new Font(lblStep1.getDisplay(), new FontData("Segoe UI Semibold", 16, SWT.NONE)));
 
@@ -233,20 +234,53 @@ public class LoginScreen extends Shell {
 			});
 		btnRegister.setBounds(215, 92, 76, 25);
 		btnRegister.setText("Register");
+		
+		CLabel lbl2 = new CLabel(compositeEntrance, SWT.NONE);
+		lbl2.setBounds(69, 13, 114, 23);
+		lbl2.setText("Login to the server");
+		lbl2.setFont(SWTResourceManager.getFont("Segoe UI Semilight", 10, SWT.NORMAL));
 
 		lblStatus = new CLabel(this, SWT.BORDER | SWT.SHADOW_IN);
 		lblStatus.setLeftMargin(5);
-		lblStatus.setBounds(0, 291, 444, 23);
+		lblStatus.setBounds(0, 291, 491, 23);
 		lblStatus.setText("Status: Idle");
 		
 		compositeNfsw = new Composite(this, SWT.NONE);
 		compositeNfsw.setEnabled(false);
-		compositeNfsw.setBounds(51, 145, 327, 129);
+		compositeNfsw.setBounds(9, 145, 304, 129);
 		
 		CLabel lblStep2 = new CLabel(compositeNfsw, SWT.NONE);
 		lblStep2.setText("Step 2.");
 		lblStep2.setFont(SWTResourceManager.getFont("Segoe UI Semibold", 16, SWT.NORMAL));
 		lblStep2.setBounds(0, 6, 291, 30);
+		
+		Group grpServerDetails = new Group(this, SWT.NONE);
+		grpServerDetails.setText("Current Server Details");
+		grpServerDetails.setBounds(319, 10, 162, 129);
+		
+		Label lbl3 = new Label(grpServerDetails, SWT.NONE);
+		lbl3.setBounds(10, 23, 27, 15);
+		lbl3.setText("URL: ");
+		
+		CLabel lblServerURL = new CLabel(grpServerDetails, SWT.BORDER);
+		lblServerURL.setBounds(40, 20, 112, 21);
+		lblServerURL.setText(UserPreferences.ServerURL);
+		
+		Label lbl4 = new Label(grpServerDetails, SWT.NONE);
+		lbl4.setText("Active Players: ");
+		lbl4.setBounds(10, 48, 79, 15);
+		
+		CLabel lblServerActiveSessions = new CLabel(grpServerDetails, SWT.BORDER);
+		lblServerActiveSessions.setText((String) null);
+		lblServerActiveSessions.setBounds(95, 45, 57, 21);
+		
+		Label lbl5 = new Label(grpServerDetails, SWT.NONE);
+		lbl5.setText("Total Players: ");
+		lbl5.setBounds(10, 72, 79, 15);
+		
+		CLabel lblServerTotalPlayers = new CLabel(grpServerDetails, SWT.BORDER);
+		lblServerTotalPlayers.setText((String) null);
+		lblServerTotalPlayers.setBounds(95, 69, 57, 21);
 	}
 
 	private void readSettings() {
