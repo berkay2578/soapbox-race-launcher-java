@@ -43,6 +43,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -128,10 +129,12 @@ public class LoginScreen extends Shell {
 			public void widgetSelected(SelectionEvent arg0) {
 				Shell a = getShell();
 				ServerSelection dialog = new ServerSelection(a, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-				UserPreferences.ServerURL = dialog.open();
+				String result[] = dialog.open();
+				UserPreferences.ServerURL = result[0];
+				UserPreferences.ServerHttpPort = result[1];
 				saveSettings();
 				lblServerURL.setText(UserPreferences.ServerURL.replace("http://", ""));
-				lblHttpPort.setText(UserPreferences.ServerPort);
+				lblHttpPort.setText(UserPreferences.ServerHttpPort);
 			}
 		});
 		mntmServerSelect.setText("Select a server...");
@@ -180,7 +183,7 @@ public class LoginScreen extends Shell {
 		compositeEntrance = new Composite(this, SWT.NONE);
 		compositeEntrance.setBounds(9, 10, 304, 129);
 		compositeEntrance.setLayout(null);
-		
+
 		CLabel lblStep1 = new CLabel(compositeEntrance, SWT.NONE);
 		lblStep1.setLocation(0, 6);
 		lblStep1.setSize(67, 30);
@@ -207,38 +210,34 @@ public class LoginScreen extends Shell {
 		btnLogin.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent arg0) {
-				BusyIndicator.showWhile(Display.getDefault(), new Runnable()
-				{
-				    public void run()
-				    {
+				BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+					public void run() {
 						doLogin(txtEmail.getText(), DigestUtils.sha1Hex(txtPassword.getText()));
-				    }
+					}
 				});
 			}
 		});
-		btnLogin.setBounds(123, 92, 56, 25);
+		btnLogin.setBounds(131, 92, 56, 25);
 		btnLogin.setText("Login");
-		
+
 		Label lbl1 = new Label(compositeEntrance, SWT.NONE);
-		lbl1.setBounds(183, 97, 26, 15);
-		lbl1.setText("- or");
-		
+		lbl1.setBounds(193, 97, 16, 15);
+		lbl1.setText("or");
+
 		Button btnRegister = new Button(compositeEntrance, SWT.NONE);
 		btnRegister.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent arg0) {
-				BusyIndicator.showWhile(Display.getDefault(), new Runnable()
-				{
-				    public void run()
-				    {
+				BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+					public void run() {
 						doRegister(txtEmail.getText(), DigestUtils.sha1Hex(txtPassword.getText()));
-				    }
+					}
 				});
-				}
-			});
+			}
+		});
 		btnRegister.setBounds(215, 92, 76, 25);
 		btnRegister.setText("Register");
-		
+
 		CLabel lbl2 = new CLabel(compositeEntrance, SWT.NONE);
 		lbl2.setBounds(69, 13, 114, 23);
 		lbl2.setText("Login to the server");
@@ -248,50 +247,118 @@ public class LoginScreen extends Shell {
 		lblStatus.setLeftMargin(5);
 		lblStatus.setBounds(0, 291, 491, 23);
 		lblStatus.setText("Status: Idle");
-		
+
 		compositeNfsw = new Composite(this, SWT.NONE);
 		compositeNfsw.setEnabled(false);
 		compositeNfsw.setBounds(9, 145, 304, 129);
-		
+
 		CLabel lblStep2 = new CLabel(compositeNfsw, SWT.NONE);
 		lblStep2.setText("Step 2.");
 		lblStep2.setFont(SWTResourceManager.getFont("Segoe UI Semibold", 16, SWT.NORMAL));
-		lblStep2.setBounds(0, 6, 291, 30);
-		
+		lblStep2.setBounds(0, 6, 72, 30);
+		lblStep2.setEnabled(false);
+
+		CLabel lbl7 = new CLabel(compositeNfsw, SWT.NONE);
+		lbl7.setText("Start NFS: World");
+		lbl7.setFont(SWTResourceManager.getFont("Segoe UI Semilight", 10, SWT.NORMAL));
+		lbl7.setBounds(71, 13, 114, 23);
+		lbl7.setEnabled(false);
+
+		Label lbl8 = new Label(compositeNfsw, SWT.NONE);
+		lbl8.setBounds(24, 41, 96, 15);
+		lbl8.setText("NFS: World Path:");
+		lbl8.setEnabled(false);
+
+		CLabel lblNfsWorldPath = new CLabel(compositeNfsw, SWT.BORDER);
+		lblNfsWorldPath.setText(UserPreferences.NFSWorldPath);
+		lblNfsWorldPath.setBounds(121, 40, 135, 21);
+		lblNfsWorldPath.setEnabled(false);
+
+		Button btnNfsWorldPath = new Button(compositeNfsw, SWT.NONE);
+		btnNfsWorldPath.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent arg0) {
+				BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+					public void run() {
+						FileDialog dialog = new FileDialog(getShell(), SWT.OPEN);
+						dialog.setFileName("nfsw");
+						dialog.setFilterExtensions(new String[] { "*.exe" });
+						dialog.setFilterPath("C:\\ProgramData\\Electronic Arts\\Need for Speed World");
+						UserPreferences.NFSWorldPath = dialog.open();
+						saveSettings();
+						lblNfsWorldPath.setText(UserPreferences.NFSWorldPath);
+					}
+				});
+			}
+		});
+		btnNfsWorldPath.setBounds(258, 38, 33, 25);
+		btnNfsWorldPath.setText("...");
+		btnNfsWorldPath.setEnabled(false);
+
+		CLabel lblFiller = new CLabel(compositeNfsw, SWT.BORDER | SWT.SHADOW_IN | SWT.SHADOW_OUT | SWT.CENTER);
+		lblFiller.setAlignment(SWT.CENTER);
+		lblFiller.setBounds(0, 72, 202, 57);
+		lblFiller.setText("FILL THIS PLACE WITH SOMETHING PLEASE THANKS, LOV U BB :*");
+		lblFiller.setEnabled(false);
+
+		Button btnLaunchNfsWorld = new Button(compositeNfsw, SWT.NONE);
+		btnLaunchNfsWorld.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent arg0) {
+				try {
+					if (!UserPreferences.NFSWorldPath.isEmpty()) {
+						new ProcessBuilder(UserPreferences.NFSWorldPath,
+								"THANKSOBAMA", UserPreferences.ServerURL.concat(":")
+										.concat(UserPreferences.ServerHttpPort).concat("/nfsw/Engine.svc"),
+								loginToken, userId).start();
+						// I'm not managing this shit, ain't nobody got time for that.
+						lblStatus.setText("Status: NFS World launched successfully!");
+					}
+					else
+						lblStatus.setText("Launch Error: NFS World path is null.");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		btnLaunchNfsWorld.setBounds(216, 67, 75, 25);
+		btnLaunchNfsWorld.setText("Launch");
+		btnLaunchNfsWorld.setEnabled(false);
+
 		Group grpServerDetails = new Group(this, SWT.NONE);
 		grpServerDetails.setText("Current Server Details");
 		grpServerDetails.setBounds(319, 10, 162, 122);
-		
+
 		Label lbl3 = new Label(grpServerDetails, SWT.NONE);
 		lbl3.setBounds(10, 23, 27, 15);
 		lbl3.setText("URL: ");
-		
+
 		lblServerURL = new CLabel(grpServerDetails, SWT.BORDER);
 		lblServerURL.setBounds(40, 20, 112, 21);
 		lblServerURL.setText(UserPreferences.ServerURL.replace("http://", ""));
-		
+
 		Label lbl4 = new Label(grpServerDetails, SWT.NONE);
 		lbl4.setText("Active Players: ");
 		lbl4.setBounds(10, 71, 79, 15);
-		
+
 		CLabel lblServerActiveSessions = new CLabel(grpServerDetails, SWT.BORDER);
 		lblServerActiveSessions.setText((String) null);
 		lblServerActiveSessions.setBounds(95, 68, 57, 21);
-		
+
 		Label lbl5 = new Label(grpServerDetails, SWT.NONE);
 		lbl5.setText("Total Players: ");
 		lbl5.setBounds(10, 95, 79, 15);
-		
+
 		CLabel lblServerTotalPlayers = new CLabel(grpServerDetails, SWT.BORDER);
 		lblServerTotalPlayers.setText((String) null);
 		lblServerTotalPlayers.setBounds(95, 92, 57, 21);
-		
+
 		Label lbl6 = new Label(grpServerDetails, SWT.NONE);
 		lbl6.setText("HTTP Port: ");
 		lbl6.setBounds(10, 47, 62, 15);
-		
+
 		lblHttpPort = new CLabel(grpServerDetails, SWT.BORDER);
-		lblHttpPort.setText(UserPreferences.ServerPort);
+		lblHttpPort.setText(UserPreferences.ServerHttpPort);
 		lblHttpPort.setBounds(78, 44, 74, 21);
 	}
 
@@ -300,10 +367,12 @@ public class LoginScreen extends Shell {
 			File settings = new File(dirLauncherSettings.concat(fileLauncherSettings));
 			if (settings.createNewFile()) {
 				List<String> defaultSettings = Arrays.asList("<LauncherSettings>", "	<Server>",
-						"		<URL>http://localhost:1337</URL>", "	</Server>", "	<Preferences>",
-						"		<AutoLogin>false</AutoLogin>", "		<AutoUpdateServers>false</AutoUpdateServers>",
-						"		<KeepServerCache>true</KeepServerCache>", "	</Preferences>", "	<LoginData>",
-						"		<Email/>", "		<Password/>", "	</LoginData>", "</LauncherSettings>");
+						"		<URL>http://localhost</URL>", "		<Port>1337</Port>", "		<LoginData>",
+						"			<Email/>", "			<Password/>", "		</LoginData>", "	</Server>",
+						"	<Preferences>", "		<AutoLogin>false</AutoLogin>",
+						"		<AutoUpdateServers>false</AutoUpdateServers>",
+						"		<KeepServerCache>true</KeepServerCache>", "	</Preferences>", "	<NFSWorld>",
+						"		<Path/>", "	</NFSWorld>", "</LauncherSettings>");
 				Files.write(Paths.get(dirLauncherSettings.concat(fileLauncherSettings)), defaultSettings,
 						StandardCharsets.UTF_8);
 			}
@@ -318,10 +387,10 @@ public class LoginScreen extends Shell {
 					.valueOf(doc.getElementsByTagName("AutoUpdateServers").item(0).getTextContent());
 			Boolean keepServerCache = Boolean
 					.valueOf(doc.getElementsByTagName("KeepServerCache").item(0).getTextContent());
-			String[] server = doc.getElementsByTagName("URL").item(0).getTextContent().split(":");
-			String serverURL = (server[0].startsWith("http") ? server[0].concat(":").concat(server[1]) : server[0]);
-			String serverPort = (server[0].startsWith("http") ? server[2] : server[1]);
-			UserPreferences.init(autoLogin, autoUpdateServers, keepServerCache, serverURL, serverPort);
+			String serverURL = doc.getElementsByTagName("URL").item(0).getTextContent();
+			String serverHttpPort = doc.getElementsByTagName("HTTPPort").item(0).getTextContent();
+			String nfswPath = doc.getElementsByTagName("NFSWorld").item(0).getFirstChild().getTextContent();
+			UserPreferences.init(autoLogin, autoUpdateServers, keepServerCache, serverURL, serverHttpPort, nfswPath);
 		} catch (ParserConfigurationException | SAXException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -334,10 +403,12 @@ public class LoginScreen extends Shell {
 			File settings = new File(dirLauncherSettings.concat(fileLauncherSettings));
 			if (settings.createNewFile()) {
 				List<String> defaultSettings = Arrays.asList("<LauncherSettings>", "	<Server>",
-						"		<URL>http://localhost:1337</URL>", "	</Server>", "	<Preferences>",
-						"		<AutoLogin>false</AutoLogin>", "		<AutoUpdateServers>false</AutoUpdateServers>",
-						"		<KeepServerCache>true</KeepServerCache>", "	</Preferences>", "	<LoginData>",
-						"		<Email/>", "		<Password/>", "	</LoginData>", "</LauncherSettings>");
+						"		<URL>http://localhost</URL>", "		<Port>1337</Port>", "		<LoginData>",
+						"			<Email/>", "			<Password/>", "		</LoginData>", "	</Server>",
+						"	<Preferences>", "		<AutoLogin>false</AutoLogin>",
+						"		<AutoUpdateServers>false</AutoUpdateServers>",
+						"		<KeepServerCache>true</KeepServerCache>", "	</Preferences>", "	<NFSWorld>",
+						"		<Path/>", "	</NFSWorld>", "</LauncherSettings>");
 				Files.write(Paths.get(dirLauncherSettings.concat(fileLauncherSettings)), defaultSettings,
 						StandardCharsets.UTF_8);
 			}
@@ -353,12 +424,14 @@ public class LoginScreen extends Shell {
 			doc.getElementsByTagName("KeepServerCache").item(0)
 					.setTextContent(String.valueOf(UserPreferences.KeepServerCache));
 			doc.getElementsByTagName("URL").item(0).setTextContent(UserPreferences.ServerURL);
+			doc.getElementsByTagName("HTTPPort").item(0).setTextContent(UserPreferences.ServerHttpPort);
+			doc.getElementsByTagName("NFSWorld").item(0).getFirstChild().setTextContent(UserPreferences.NFSWorldPath);
 
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
 			DOMSource source = new DOMSource(doc);
 			StreamResult result = new StreamResult(settings);
 
@@ -383,7 +456,8 @@ public class LoginScreen extends Shell {
 					URLEncoder.encode(email, StandardCharsets.UTF_8.toString()),
 					URLEncoder.encode(password, StandardCharsets.UTF_8.toString()));
 
-			URL serverAuth = new URL(String.format("%s:%s/nfsw/Engine.svc/User/AuthenticateUser?%s", UserPreferences.ServerURL, UserPreferences.ServerPort, param));
+			URL serverAuth = new URL(String.format("%s:%s/nfsw/Engine.svc/User/AuthenticateUser?%s",
+					UserPreferences.ServerURL, UserPreferences.ServerHttpPort, param));
 			HttpURLConnection serverCon = (HttpURLConnection) serverAuth.openConnection();
 			serverCon.setRequestMethod("GET");
 
@@ -426,7 +500,7 @@ public class LoginScreen extends Shell {
 		}
 		setEnabled(compositeEntrance, true);
 	}
-	
+
 	private void doRegister(String email, String password) {
 		try {
 			lblStatus.setText("Status: Registering email ".concat(txtEmail.getText()));
@@ -441,7 +515,8 @@ public class LoginScreen extends Shell {
 					URLEncoder.encode(email, StandardCharsets.UTF_8.toString()),
 					URLEncoder.encode(password, StandardCharsets.UTF_8.toString()));
 
-			URL serverAuth = new URL(String.format("%s:%s/nfsw/Engine.svc/User/CreateUser?%s", UserPreferences.ServerURL, UserPreferences.ServerPort, param));
+			URL serverAuth = new URL(String.format("%s:%s/nfsw/Engine.svc/User/CreateUser?%s",
+					UserPreferences.ServerURL, UserPreferences.ServerHttpPort, param));
 			HttpURLConnection serverCon = (HttpURLConnection) serverAuth.openConnection();
 			serverCon.setRequestMethod("GET");
 
@@ -485,16 +560,15 @@ public class LoginScreen extends Shell {
 		}
 		setEnabled(compositeEntrance, true);
 	}
-	
+
 	private void setEnabled(Control control, boolean boolTrue) {
-	    if (control instanceof Composite)
-	    {
-	        Composite composite = (Composite) control;
-	        for (Control ctrl : composite.getChildren())
-	            setEnabled(ctrl, boolTrue);
-	    }
-	    else
-	        control.setEnabled(boolTrue);
+		if (control instanceof Composite) {
+			Composite composite = (Composite) control;
+			composite.setEnabled(boolTrue);
+			for (Control ctrl : composite.getChildren())
+				setEnabled(ctrl, boolTrue);
+		} else
+			control.setEnabled(boolTrue);
 	}
 
 	@Override

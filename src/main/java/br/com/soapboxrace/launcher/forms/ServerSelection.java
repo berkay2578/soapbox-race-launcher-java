@@ -1,9 +1,5 @@
 package br.com.soapboxrace.launcher.forms;
 
-import org.eclipse.swt.widgets.Dialog;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.List;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,18 +10,21 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.swt.widgets.Dialog;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.Shell;
 
 public class ServerSelection extends Dialog {
 
-	protected String result;
+	protected String[] server;
 	protected Shell shlServerSelection;
 
 	private List listServer;
@@ -51,7 +50,7 @@ public class ServerSelection extends Dialog {
 	 * 
 	 * @return the result
 	 */
-	public String open() {
+	public String[] open() {
 		createContents();
 		downloadServerList(false);
 		shlServerSelection.open();
@@ -62,17 +61,20 @@ public class ServerSelection extends Dialog {
 				display.sleep();
 			}
 		}
-		return result;
+		return server;
 	}
-	
+
 	private void downloadServerList(boolean deleteExistingList) {
 		lblStatus.setText("Status: Refreshing server list...");
 		new File(dirServerList).mkdir();
 		File list = new File(dirServerList.concat(fileServerList));
 		try {
-			if (deleteExistingList) if (list.exists()) list.delete();
+			if (deleteExistingList)
+				if (list.exists())
+					list.delete();
 			if (list.createNewFile()) {
-				URL soapboxServers = new URL("https://raw.githubusercontent.com/nilzao/soapbox-race-hill/master/serverlist.txt"); // temporary
+				URL soapboxServers = new URL(
+						"https://raw.githubusercontent.com/nilzao/soapbox-race-hill/master/serverlist.txt"); // temporary
 				try (ReadableByteChannel rbc = Channels.newChannel(soapboxServers.openStream())) {
 					try (FileOutputStream fos = new FileOutputStream(list)) {
 						fos.getChannel().transferFrom(rbc, 0, Integer.MAX_VALUE);
@@ -141,7 +143,12 @@ public class ServerSelection extends Dialog {
 		btnSelect.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent arg0) {
-				result = listServer.getSelection()[0];
+				String[] serverData = new String[2];
+				String[] tempArr = listServer.getSelection()[0].split(":");
+				serverData[0] = (tempArr[0].startsWith("http") ? tempArr[0].concat(":").concat(tempArr[1])
+						: tempArr[0]);
+				serverData[1] = (tempArr[0].startsWith("http") ? tempArr[2] : tempArr[1]);
+				server = serverData;
 				shlServerSelection.close();
 			}
 		});
