@@ -53,6 +53,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import br.com.soapboxrace.launcher.variables.ServerData;
 import br.com.soapboxrace.launcher.variables.UserPreferences;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.eclipse.swt.events.ShellAdapter;
@@ -360,6 +361,12 @@ public class LoginScreen extends Shell {
 		lblHttpPort = new CLabel(grpServerDetails, SWT.BORDER);
 		lblHttpPort.setText(UserPreferences.ServerHttpPort);
 		lblHttpPort.setBounds(78, 44, 74, 21);
+		
+		if (UserPreferences.AutoLogin && (!ServerData.Email.isEmpty() & !ServerData.PasswordHash.isEmpty())) {
+			txtEmail.setText(ServerData.Email);
+			txtPassword.setText(ServerData.PasswordHash);
+			doLogin(txtEmail.getText(), txtPassword.getText());
+		}
 	}
 
 	private void readSettings() {
@@ -391,6 +398,10 @@ public class LoginScreen extends Shell {
 			String serverHttpPort = doc.getElementsByTagName("HTTPPort").item(0).getTextContent();
 			String nfswPath = doc.getElementsByTagName("NFSWorld").item(0).getFirstChild().getTextContent();
 			UserPreferences.init(autoLogin, autoUpdateServers, keepServerCache, serverURL, serverHttpPort, nfswPath);
+			
+			String email = doc.getElementsByTagName("Email").item(0).getTextContent();
+			String passwordHash = doc.getElementsByTagName("Password").item(0).getTextContent();
+			ServerData.init(email, passwordHash);
 		} catch (ParserConfigurationException | SAXException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -431,7 +442,47 @@ public class LoginScreen extends Shell {
 			Transformer transformer = transformerFactory.newTransformer();
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+			DOMSource source = new DOMSource(doc);
+			StreamResult result = new StreamResult(settings);
+
+			transformer.transform(source, result);
+		} catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void saveCredentials(String email, String passwordHash) {
+		try {
+			File settings = new File(dirLauncherSettings.concat(fileLauncherSettings));
+			if (settings.createNewFile()) {
+				List<String> defaultSettings = Arrays.asList("<LauncherSettings>", "	<Server>",
+						"		<URL>http://localhost</URL>", "		<Port>1337</Port>", "		<LoginData>",
+						"			<Email/>", "			<Password/>", "		</LoginData>", "	</Server>",
+						"	<Preferences>", "		<AutoLogin>false</AutoLogin>",
+						"		<AutoUpdateServers>false</AutoUpdateServers>",
+						"		<KeepServerCache>true</KeepServerCache>", "	</Preferences>", "	<NFSWorld>",
+						"		<Path/>", "	</NFSWorld>", "</LauncherSettings>");
+				Files.write(Paths.get(dirLauncherSettings.concat(fileLauncherSettings)), defaultSettings,
+						StandardCharsets.UTF_8);
+			}
+
+			ServerData.init(email, passwordHash);
+			
+			DocumentBuilderFactory dcFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dcBuilder = dcFactory.newDocumentBuilder();
+			Document doc = dcBuilder.parse(settings);
+			doc.getDocumentElement().normalize();
+
+			doc.getElementsByTagName("Email").item(0).setTextContent(ServerData.Email);
+			doc.getElementsByTagName("Password").item(0).setTextContent(ServerData.PasswordHash);
+
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 			DOMSource source = new DOMSource(doc);
 			StreamResult result = new StreamResult(settings);
 
@@ -442,7 +493,7 @@ public class LoginScreen extends Shell {
 		}
 	}
 
-	private void doLogin(String email, String password) {
+	private void doLogin(String email, String passwordHash) {
 		try {
 			lblStatus.setText("Status: Logging in...");
 			setEnabled(compositeEntrance, false);
@@ -454,7 +505,7 @@ public class LoginScreen extends Shell {
 
 			String param = String.format("email=%s&password=%s",
 					URLEncoder.encode(email, StandardCharsets.UTF_8.toString()),
-					URLEncoder.encode(password, StandardCharsets.UTF_8.toString()));
+					URLEncoder.encode(passwordHash, StandardCharsets.UTF_8.toString()));
 
 			URL serverAuth = new URL(String.format("%s:%s/nfsw/Engine.svc/User/AuthenticateUser?%s",
 					UserPreferences.ServerURL, UserPreferences.ServerHttpPort, param));
@@ -476,6 +527,7 @@ public class LoginScreen extends Shell {
 			if (serverCon.getResponseCode() == 200) {
 				userId = doc.getElementsByTagName("UserId").item(0).getTextContent();
 				loginToken = doc.getElementsByTagName("LoginToken").item(0).getTextContent();
+				saveCredentials(email, passwordHash);
 				lblStatus.setText("Status: Logged in!");
 				setEnabled(compositeNfsw, true);
 				return;
@@ -501,7 +553,7 @@ public class LoginScreen extends Shell {
 		setEnabled(compositeEntrance, true);
 	}
 
-	private void doRegister(String email, String password) {
+	private void doRegister(String email, String passwordHash) {
 		try {
 			lblStatus.setText("Status: Registering email ".concat(txtEmail.getText()));
 			setEnabled(compositeEntrance, false);
@@ -513,7 +565,7 @@ public class LoginScreen extends Shell {
 
 			String param = String.format("email=%s&password=%s",
 					URLEncoder.encode(email, StandardCharsets.UTF_8.toString()),
-					URLEncoder.encode(password, StandardCharsets.UTF_8.toString()));
+					URLEncoder.encode(passwordHash, StandardCharsets.UTF_8.toString()));
 
 			URL serverAuth = new URL(String.format("%s:%s/nfsw/Engine.svc/User/CreateUser?%s",
 					UserPreferences.ServerURL, UserPreferences.ServerHttpPort, param));
@@ -535,6 +587,7 @@ public class LoginScreen extends Shell {
 			if (serverCon.getResponseCode() == 200) {
 				userId = doc.getElementsByTagName("UserId").item(0).getTextContent();
 				loginToken = doc.getElementsByTagName("LoginToken").item(0).getTextContent();
+				saveCredentials(email, passwordHash);
 				lblStatus.setText("Status: Registered and logged in!");
 				setEnabled(compositeNfsw, true);
 				return;
