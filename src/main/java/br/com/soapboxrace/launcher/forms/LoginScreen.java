@@ -371,10 +371,11 @@ public class LoginScreen extends Shell {
 
 	private void readSettings() {
 		try {
+			new File(dirLauncherSettings).mkdirs();
 			File settings = new File(dirLauncherSettings.concat(fileLauncherSettings));
 			if (settings.createNewFile()) {
 				List<String> defaultSettings = Arrays.asList("<LauncherSettings>", "	<Server>",
-						"		<URL>http://localhost</URL>", "		<Port>1337</Port>", "		<LoginData>",
+						"		<URL>http://localhost</URL>", "		<HTTPPort>1337</HTTPPort>", "		<LoginData>",
 						"			<Email/>", "			<Password/>", "		</LoginData>", "	</Server>",
 						"	<Preferences>", "		<AutoLogin>false</AutoLogin>",
 						"		<AutoUpdateServers>false</AutoUpdateServers>",
@@ -411,10 +412,11 @@ public class LoginScreen extends Shell {
 
 	private void saveSettings() {
 		try {
+			new File(dirLauncherSettings).mkdirs();
 			File settings = new File(dirLauncherSettings.concat(fileLauncherSettings));
 			if (settings.createNewFile()) {
 				List<String> defaultSettings = Arrays.asList("<LauncherSettings>", "	<Server>",
-						"		<URL>http://localhost</URL>", "		<Port>1337</Port>", "		<LoginData>",
+						"		<URL>http://localhost</URL>", "		<HTTPPort>1337</HTTPPort>", "		<LoginData>",
 						"			<Email/>", "			<Password/>", "		</LoginData>", "	</Server>",
 						"	<Preferences>", "		<AutoLogin>false</AutoLogin>",
 						"		<AutoUpdateServers>false</AutoUpdateServers>",
@@ -455,10 +457,11 @@ public class LoginScreen extends Shell {
 	
 	private void saveCredentials(String email, String passwordHash) {
 		try {
+			new File(dirLauncherSettings).mkdirs();
 			File settings = new File(dirLauncherSettings.concat(fileLauncherSettings));
 			if (settings.createNewFile()) {
 				List<String> defaultSettings = Arrays.asList("<LauncherSettings>", "	<Server>",
-						"		<URL>http://localhost</URL>", "		<Port>1337</Port>", "		<LoginData>",
+						"		<URL>http://localhost</URL>", "		<HTTPPort>1337</HTTPPort>", "		<LoginData>",
 						"			<Email/>", "			<Password/>", "		</LoginData>", "	</Server>",
 						"	<Preferences>", "		<AutoLogin>false</AutoLogin>",
 						"		<AutoUpdateServers>false</AutoUpdateServers>",
