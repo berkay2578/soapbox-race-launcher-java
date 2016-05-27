@@ -111,7 +111,7 @@ public class LoginScreen extends Shell {
 			}
 		});
 		setText("Soapbox-Hill | server launcher");
-		setSize(537, 395);
+		setSize(537, 401);
 		readSettings();
 		setLayout(null);
 
@@ -183,7 +183,7 @@ public class LoginScreen extends Shell {
 		mntmAbout.setText("About");
 
 		compositeEntrance = new Composite(this, SWT.NONE);
-		compositeEntrance.setBounds(9, 10, 344, 161);
+		compositeEntrance.setBounds(9, 10, 329, 161);
 		compositeEntrance.setLayout(null);
 
 		CLabel lblStep1 = new CLabel(compositeEntrance, SWT.NONE);
@@ -200,15 +200,15 @@ public class LoginScreen extends Shell {
 		lblPassword.setText("Password: ");
 
 		txtEmail = new Text(compositeEntrance, SWT.BORDER);
-		txtEmail.setBounds(135, 44, 199, 21);
+		txtEmail.setBounds(109, 44, 199, 21);
 		txtEmail.setTextLimit(254);
 
 		txtPassword = new Text(compositeEntrance, SWT.BORDER | SWT.PASSWORD);
-		txtPassword.setBounds(135, 79, 199, 21);
+		txtPassword.setBounds(109, 79, 199, 21);
 		txtPassword.setTextLimit(64);
 
 		Button btnLogin = new Button(compositeEntrance, SWT.NONE);
-		btnLogin.setBounds(174, 111, 56, 25);
+		btnLogin.setBounds(142, 111, 56, 25);
 		btnLogin.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent arg0) {
@@ -222,11 +222,12 @@ public class LoginScreen extends Shell {
 		btnLogin.setText("Login");
 
 		Label lbl1 = new Label(compositeEntrance, SWT.NONE);
-		lbl1.setBounds(236, 116, 16, 15);
+		lbl1.setAlignment(SWT.CENTER);
+		lbl1.setBounds(204, 116, 22, 15);
 		lbl1.setText("or");
 
 		Button btnRegister = new Button(compositeEntrance, SWT.NONE);
-		btnRegister.setBounds(258, 111, 76, 25);
+		btnRegister.setBounds(232, 111, 76, 25);
 		btnRegister.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent arg0) {
@@ -240,7 +241,7 @@ public class LoginScreen extends Shell {
 		btnRegister.setText("Register");
 
 		CLabel lbl2 = new CLabel(compositeEntrance, SWT.NONE);
-		lbl2.setBounds(93, 16, 239, 21);
+		lbl2.setBounds(92, 15, 215, 21);
 		lbl2.setText("Login to the server");
 		lbl2.setFont(SWTResourceManager.getFont("Segoe UI Semilight", 10, SWT.NORMAL));
 		
@@ -263,7 +264,7 @@ public class LoginScreen extends Shell {
 		btnLogout.setEnabled(false);
 
 		lblStatus = new CLabel(this, SWT.BORDER | SWT.SHADOW_IN);
-		lblStatus.setBounds(0, 323, 531, 23);
+		lblStatus.setBounds(2, 323, 526, 26);
 		lblStatus.setLeftMargin(5);
 		lblStatus.setText("Status: Idle");
 
@@ -273,29 +274,29 @@ public class LoginScreen extends Shell {
 		compositeNfsw.setEnabled(false);
 
 		CLabel lblStep2 = new CLabel(compositeNfsw, SWT.NONE);
-		lblStep2.setBounds(7, 7, 81, 30);
+		lblStep2.setBounds(7, 7, 80, 30);
 		lblStep2.setText("Step 2.");
 		lblStep2.setFont(SWTResourceManager.getFont("Segoe UI Semibold", 16, SWT.NORMAL));
 		lblStep2.setEnabled(false);
 
 		CLabel lbl7 = new CLabel(compositeNfsw, SWT.NONE);
-		lbl7.setBounds(91, 15, 270, 21);
+		lbl7.setBounds(92, 15, 218, 21);
 		lbl7.setText("Start NFS: World");
 		lbl7.setFont(SWTResourceManager.getFont("Segoe UI Semilight", 10, SWT.NORMAL));
 		lbl7.setEnabled(false);
 
 		Label lbl8 = new Label(compositeNfsw, SWT.NONE);
-		lbl8.setBounds(10, 50, 96, 15);
+		lbl8.setBounds(28, 50, 96, 15);
 		lbl8.setText("NFS: World Path:");
 		lbl8.setEnabled(false);
 
 		CLabel lblNfsWorldPath = new CLabel(compositeNfsw, SWT.BORDER);
-		lblNfsWorldPath.setBounds(114, 46, 178, 23);
+		lblNfsWorldPath.setBounds(132, 46, 178, 23);
 		lblNfsWorldPath.setText(UserPreferences.NFSWorldPath);
 		lblNfsWorldPath.setEnabled(false);
 
 		Button btnNfsWorldPath = new Button(compositeNfsw, SWT.NONE);
-		btnNfsWorldPath.setBounds(309, 45, 33, 25);
+		btnNfsWorldPath.setBounds(327, 45, 33, 25);
 		btnNfsWorldPath.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent arg0) {
@@ -340,7 +341,7 @@ public class LoginScreen extends Shell {
 		btnLaunchNfsWorld.setEnabled(false);
 
 		Group grpServerDetails = new Group(this, SWT.NONE);
-		grpServerDetails.setBounds(359, 10, 162, 161);
+		grpServerDetails.setBounds(344, 10, 177, 161);
 		grpServerDetails.setText("Current Server Details");
 		grpServerDetails.setLayout(null);
 
@@ -349,7 +350,7 @@ public class LoginScreen extends Shell {
 		lbl3.setText("URL: ");
 
 		lblServerURL = new CLabel(grpServerDetails, SWT.BORDER);
-		lblServerURL.setBounds(40, 20, 112, 21);
+		lblServerURL.setBounds(56, 20, 112, 21);
 		lblServerURL.setAlignment(SWT.RIGHT);
 		lblServerURL.setText(UserPreferences.ServerURL.replace("http://", ""));
 
@@ -358,7 +359,7 @@ public class LoginScreen extends Shell {
 		lbl4.setText("Active Players: ");
 
 		CLabel lblServerActiveSessions = new CLabel(grpServerDetails, SWT.BORDER);
-		lblServerActiveSessions.setBounds(95, 68, 57, 21);
+		lblServerActiveSessions.setBounds(111, 68, 57, 21);
 		lblServerActiveSessions.setAlignment(SWT.RIGHT);
 		lblServerActiveSessions.setText((String) null);
 
@@ -367,7 +368,7 @@ public class LoginScreen extends Shell {
 		lbl5.setText("Total Players: ");
 
 		CLabel lblServerTotalPlayers = new CLabel(grpServerDetails, SWT.BORDER);
-		lblServerTotalPlayers.setBounds(95, 92, 57, 21);
+		lblServerTotalPlayers.setBounds(111, 92, 57, 21);
 		lblServerTotalPlayers.setAlignment(SWT.RIGHT);
 		lblServerTotalPlayers.setText((String) null);
 
@@ -376,7 +377,7 @@ public class LoginScreen extends Shell {
 		lbl6.setText("HTTP Port: ");
 
 		lblHttpPort = new CLabel(grpServerDetails, SWT.BORDER);
-		lblHttpPort.setBounds(78, 44, 74, 21);
+		lblHttpPort.setBounds(94, 44, 74, 21);
 		lblHttpPort.setAlignment(SWT.RIGHT);
 		lblHttpPort.setText(UserPreferences.ServerHttpPort);
 		
