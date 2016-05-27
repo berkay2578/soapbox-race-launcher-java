@@ -145,9 +145,8 @@ public class ServerSelection extends Dialog {
 			public void mouseUp(MouseEvent arg0) {
 				String[] serverData = new String[2];
 				String[] tempArr = listServer.getSelection()[0].split(":");
-				serverData[0] = (tempArr[0].startsWith("http") ? tempArr[0].concat(":").concat(tempArr[1])
-						: tempArr[0]);
-				serverData[1] = (tempArr[0].startsWith("http") ? tempArr[2] : tempArr[1]);
+				serverData[0] = tempArr[0].concat(":").concat(tempArr[1]);
+				serverData[1] = tempArr[2];
 				server = serverData;
 				shlServerSelection.close();
 			}
