@@ -59,9 +59,6 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormAttachment;
 
 public class LoginScreen extends Shell {
 	private Text txtPassword;
@@ -69,6 +66,7 @@ public class LoginScreen extends Shell {
 	private CLabel lblStatus;
 	private CLabel lblServerURL;
 	private CLabel lblHttpPort;
+	private Button btnLogout;
 	private Composite compositeEntrance;
 	private Composite compositeNfsw;
 
@@ -113,9 +111,9 @@ public class LoginScreen extends Shell {
 			}
 		});
 		setText("Soapbox-Hill | server launcher");
-		setSize(497, 363);
+		setSize(537, 395);
 		readSettings();
-		setLayout(new FormLayout());
+		setLayout(null);
 
 		Menu menu = new Menu(this, SWT.BAR);
 		setMenuBar(menu);
@@ -185,59 +183,32 @@ public class LoginScreen extends Shell {
 		mntmAbout.setText("About");
 
 		compositeEntrance = new Composite(this, SWT.NONE);
-		FormData fd_compositeEntrance = new FormData();
-		fd_compositeEntrance.bottom = new FormAttachment(0, 139);
-		fd_compositeEntrance.right = new FormAttachment(0, 313);
-		fd_compositeEntrance.top = new FormAttachment(0, 10);
-		fd_compositeEntrance.left = new FormAttachment(0, 9);
-		compositeEntrance.setLayoutData(fd_compositeEntrance);
-		compositeEntrance.setLayout(new FormLayout());
+		compositeEntrance.setBounds(9, 10, 344, 161);
+		compositeEntrance.setLayout(null);
 
 		CLabel lblStep1 = new CLabel(compositeEntrance, SWT.NONE);
-		FormData fd_lblStep1 = new FormData();
-		fd_lblStep1.bottom = new FormAttachment(0, 36);
-		fd_lblStep1.top = new FormAttachment(0, 6);
-		fd_lblStep1.left = new FormAttachment(0);
-		lblStep1.setLayoutData(fd_lblStep1);
+		lblStep1.setBounds(7, 7, 80, 30);
 		lblStep1.setText("Step 1.");
 		lblStep1.setFont(new Font(lblStep1.getDisplay(), new FontData("Segoe UI Semibold", 16, SWT.NONE)));
 
 		Label lblEmail = new Label(compositeEntrance, SWT.NONE);
-		FormData fd_lblEmail = new FormData();
-		fd_lblEmail.top = new FormAttachment(0, 41);
-		fd_lblEmail.left = new FormAttachment(0, 24);
-		lblEmail.setLayoutData(fd_lblEmail);
+		lblEmail.setBounds(30, 47, 35, 15);
 		lblEmail.setText("Email: ");
 
 		Label lblPassword = new Label(compositeEntrance, SWT.NONE);
-		FormData fd_lblPassword = new FormData();
-		fd_lblPassword.top = new FormAttachment(0, 68);
-		fd_lblPassword.left = new FormAttachment(0, 24);
-		lblPassword.setLayoutData(fd_lblPassword);
+		lblPassword.setBounds(30, 82, 56, 15);
 		lblPassword.setText("Password: ");
 
 		txtEmail = new Text(compositeEntrance, SWT.BORDER);
-		FormData fd_txtEmail = new FormData();
-		fd_txtEmail.right = new FormAttachment(0, 291);
-		fd_txtEmail.top = new FormAttachment(0, 38);
-		fd_txtEmail.left = new FormAttachment(0, 92);
-		txtEmail.setLayoutData(fd_txtEmail);
+		txtEmail.setBounds(135, 44, 199, 21);
 		txtEmail.setTextLimit(254);
 
 		txtPassword = new Text(compositeEntrance, SWT.BORDER | SWT.PASSWORD);
-		FormData fd_txtPassword = new FormData();
-		fd_txtPassword.right = new FormAttachment(0, 291);
-		fd_txtPassword.top = new FormAttachment(0, 65);
-		fd_txtPassword.left = new FormAttachment(0, 92);
-		txtPassword.setLayoutData(fd_txtPassword);
+		txtPassword.setBounds(135, 79, 199, 21);
 		txtPassword.setTextLimit(64);
 
 		Button btnLogin = new Button(compositeEntrance, SWT.NONE);
-		FormData fd_btnLogin = new FormData();
-		fd_btnLogin.right = new FormAttachment(0, 187);
-		fd_btnLogin.top = new FormAttachment(0, 92);
-		fd_btnLogin.left = new FormAttachment(0, 131);
-		btnLogin.setLayoutData(fd_btnLogin);
+		btnLogin.setBounds(174, 111, 56, 25);
 		btnLogin.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent arg0) {
@@ -251,19 +222,11 @@ public class LoginScreen extends Shell {
 		btnLogin.setText("Login");
 
 		Label lbl1 = new Label(compositeEntrance, SWT.NONE);
-		FormData fd_lbl1 = new FormData();
-		fd_lbl1.right = new FormAttachment(0, 209);
-		fd_lbl1.top = new FormAttachment(0, 97);
-		fd_lbl1.left = new FormAttachment(0, 193);
-		lbl1.setLayoutData(fd_lbl1);
+		lbl1.setBounds(236, 116, 16, 15);
 		lbl1.setText("or");
 
 		Button btnRegister = new Button(compositeEntrance, SWT.NONE);
-		FormData fd_btnRegister = new FormData();
-		fd_btnRegister.right = new FormAttachment(0, 291);
-		fd_btnRegister.top = new FormAttachment(0, 92);
-		fd_btnRegister.left = new FormAttachment(0, 215);
-		btnRegister.setLayoutData(fd_btnRegister);
+		btnRegister.setBounds(258, 111, 76, 25);
 		btnRegister.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent arg0) {
@@ -277,79 +240,62 @@ public class LoginScreen extends Shell {
 		btnRegister.setText("Register");
 
 		CLabel lbl2 = new CLabel(compositeEntrance, SWT.NONE);
-		FormData fd_lbl2 = new FormData();
-		fd_lbl2.right = new FormAttachment(0, 291);
-		fd_lbl2.top = new FormAttachment(0, 13);
-		fd_lbl2.left = new FormAttachment(0, 69);
-		lbl2.setLayoutData(fd_lbl2);
+		lbl2.setBounds(93, 16, 239, 21);
 		lbl2.setText("Login to the server");
 		lbl2.setFont(SWTResourceManager.getFont("Segoe UI Semilight", 10, SWT.NORMAL));
+		
+		btnLogout = new Button(compositeEntrance, SWT.NONE);
+		btnLogout.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent arg0) {
+				setEnabled(compositeNfsw, false);
+				setEnabled(compositeEntrance, true);
+				btnLogout.setVisible(false);
+				btnLogout.setEnabled(false);
+				userId = null;
+				loginToken = null;
+				lblStatus.setText("Status: Logged-out successfully!");
+			}
+		});
+		btnLogout.setBounds(12, 111, 75, 25);
+		btnLogout.setText("Logout");
+		btnLogout.setVisible(false);
+		btnLogout.setEnabled(false);
 
 		lblStatus = new CLabel(this, SWT.BORDER | SWT.SHADOW_IN);
-		FormData fd_lblStatus = new FormData();
-		fd_lblStatus.bottom = new FormAttachment(0, 314);
-		fd_lblStatus.right = new FormAttachment(0, 491);
-		fd_lblStatus.top = new FormAttachment(0, 291);
-		fd_lblStatus.left = new FormAttachment(0);
-		lblStatus.setLayoutData(fd_lblStatus);
+		lblStatus.setBounds(0, 323, 531, 23);
 		lblStatus.setLeftMargin(5);
 		lblStatus.setText("Status: Idle");
 
 		compositeNfsw = new Composite(this, SWT.NONE);
-		FormData fd_compositeNfsw = new FormData();
-		fd_compositeNfsw.right = new FormAttachment(0, 313);
-		fd_compositeNfsw.top = new FormAttachment(0, 145);
-		fd_compositeNfsw.left = new FormAttachment(0, 9);
-		compositeNfsw.setLayoutData(fd_compositeNfsw);
+		compositeNfsw.setBounds(9, 177, 512, 129);
+		compositeNfsw.setLayout(null);
 		compositeNfsw.setEnabled(false);
-		compositeNfsw.setLayout(new FormLayout());
 
 		CLabel lblStep2 = new CLabel(compositeNfsw, SWT.NONE);
-		FormData fd_lblStep2 = new FormData();
-		fd_lblStep2.bottom = new FormAttachment(0, 36);
-		fd_lblStep2.right = new FormAttachment(0, 72);
-		fd_lblStep2.top = new FormAttachment(0, 6);
-		fd_lblStep2.left = new FormAttachment(0);
-		lblStep2.setLayoutData(fd_lblStep2);
+		lblStep2.setBounds(7, 7, 81, 30);
 		lblStep2.setText("Step 2.");
 		lblStep2.setFont(SWTResourceManager.getFont("Segoe UI Semibold", 16, SWT.NORMAL));
 		lblStep2.setEnabled(false);
 
 		CLabel lbl7 = new CLabel(compositeNfsw, SWT.NONE);
-		FormData fd_lbl7 = new FormData();
-		fd_lbl7.right = new FormAttachment(0, 291);
-		fd_lbl7.top = new FormAttachment(0, 13);
-		fd_lbl7.left = new FormAttachment(0, 71);
-		lbl7.setLayoutData(fd_lbl7);
+		lbl7.setBounds(91, 15, 270, 21);
 		lbl7.setText("Start NFS: World");
 		lbl7.setFont(SWTResourceManager.getFont("Segoe UI Semilight", 10, SWT.NORMAL));
 		lbl7.setEnabled(false);
 
 		Label lbl8 = new Label(compositeNfsw, SWT.NONE);
-		FormData fd_lbl8 = new FormData();
-		fd_lbl8.right = new FormAttachment(0, 120);
-		fd_lbl8.top = new FormAttachment(0, 41);
-		fd_lbl8.left = new FormAttachment(0, 24);
-		lbl8.setLayoutData(fd_lbl8);
+		lbl8.setBounds(10, 50, 96, 15);
 		lbl8.setText("NFS: World Path:");
 		lbl8.setEnabled(false);
 
 		CLabel lblNfsWorldPath = new CLabel(compositeNfsw, SWT.BORDER);
-		FormData fd_lblNfsWorldPath = new FormData();
-		fd_lblNfsWorldPath.bottom = new FormAttachment(0, 63);
-		fd_lblNfsWorldPath.right = new FormAttachment(0, 256);
-		fd_lblNfsWorldPath.top = new FormAttachment(0, 40);
-		fd_lblNfsWorldPath.left = new FormAttachment(0, 121);
-		lblNfsWorldPath.setLayoutData(fd_lblNfsWorldPath);
+		lblNfsWorldPath.setBounds(114, 46, 178, 23);
 		lblNfsWorldPath.setText(UserPreferences.NFSWorldPath);
 		lblNfsWorldPath.setEnabled(false);
 
 		Button btnNfsWorldPath = new Button(compositeNfsw, SWT.NONE);
-		FormData fd_btnNfsWorldPath = new FormData();
-		fd_btnNfsWorldPath.right = new FormAttachment(0, 291);
-		fd_btnNfsWorldPath.top = new FormAttachment(0, 38);
-		fd_btnNfsWorldPath.left = new FormAttachment(0, 258);
-		btnNfsWorldPath.setLayoutData(fd_btnNfsWorldPath);
+		btnNfsWorldPath.setBounds(309, 45, 33, 25);
 		btnNfsWorldPath.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent arg0) {
@@ -369,23 +315,8 @@ public class LoginScreen extends Shell {
 		btnNfsWorldPath.setText("...");
 		btnNfsWorldPath.setEnabled(false);
 
-		CLabel lblFiller = new CLabel(compositeNfsw, SWT.BORDER | SWT.SHADOW_IN | SWT.SHADOW_OUT | SWT.CENTER);
-		FormData fd_lblFiller = new FormData();
-		fd_lblFiller.bottom = new FormAttachment(0, 129);
-		fd_lblFiller.right = new FormAttachment(0, 202);
-		fd_lblFiller.top = new FormAttachment(0, 72);
-		fd_lblFiller.left = new FormAttachment(0);
-		lblFiller.setLayoutData(fd_lblFiller);
-		lblFiller.setAlignment(SWT.CENTER);
-		lblFiller.setText("FILL THIS PLACE WITH SOMETHING PLEASE THANKS, LOV U BB :*");
-		lblFiller.setEnabled(false);
-
 		Button btnLaunchNfsWorld = new Button(compositeNfsw, SWT.NONE);
-		FormData fd_btnLaunchNfsWorld = new FormData();
-		fd_btnLaunchNfsWorld.right = new FormAttachment(0, 291);
-		fd_btnLaunchNfsWorld.top = new FormAttachment(0, 67);
-		fd_btnLaunchNfsWorld.left = new FormAttachment(0, 216);
-		btnLaunchNfsWorld.setLayoutData(fd_btnLaunchNfsWorld);
+		btnLaunchNfsWorld.setBounds(427, 94, 75, 25);
 		btnLaunchNfsWorld.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent arg0) {
@@ -409,79 +340,44 @@ public class LoginScreen extends Shell {
 		btnLaunchNfsWorld.setEnabled(false);
 
 		Group grpServerDetails = new Group(this, SWT.NONE);
-		FormData fd_grpServerDetails = new FormData();
-		fd_grpServerDetails.bottom = new FormAttachment(0, 132);
-		fd_grpServerDetails.right = new FormAttachment(0, 481);
-		fd_grpServerDetails.top = new FormAttachment(0, 10);
-		fd_grpServerDetails.left = new FormAttachment(0, 319);
-		grpServerDetails.setLayoutData(fd_grpServerDetails);
+		grpServerDetails.setBounds(359, 10, 162, 161);
 		grpServerDetails.setText("Current Server Details");
-		grpServerDetails.setLayout(new FormLayout());
+		grpServerDetails.setLayout(null);
 
 		Label lbl3 = new Label(grpServerDetails, SWT.NONE);
-		FormData fd_lbl3 = new FormData();
-		fd_lbl3.top = new FormAttachment(0, 8);
-		fd_lbl3.left = new FormAttachment(0, 7);
-		lbl3.setLayoutData(fd_lbl3);
+		lbl3.setBounds(10, 23, 27, 15);
 		lbl3.setText("URL: ");
 
 		lblServerURL = new CLabel(grpServerDetails, SWT.BORDER);
+		lblServerURL.setBounds(40, 20, 112, 21);
 		lblServerURL.setAlignment(SWT.RIGHT);
-		FormData fd_lblServerURL = new FormData();
-		fd_lblServerURL.right = new FormAttachment(0, 149);
-		fd_lblServerURL.top = new FormAttachment(0, 5);
-		fd_lblServerURL.left = new FormAttachment(0, 37);
-		lblServerURL.setLayoutData(fd_lblServerURL);
 		lblServerURL.setText(UserPreferences.ServerURL.replace("http://", ""));
 
 		Label lbl4 = new Label(grpServerDetails, SWT.NONE);
-		FormData fd_lbl4 = new FormData();
-		fd_lbl4.top = new FormAttachment(0, 56);
-		fd_lbl4.left = new FormAttachment(0, 7);
-		lbl4.setLayoutData(fd_lbl4);
+		lbl4.setBounds(10, 71, 79, 15);
 		lbl4.setText("Active Players: ");
 
 		CLabel lblServerActiveSessions = new CLabel(grpServerDetails, SWT.BORDER);
+		lblServerActiveSessions.setBounds(95, 68, 57, 21);
 		lblServerActiveSessions.setAlignment(SWT.RIGHT);
-		FormData fd_lblServerActiveSessions = new FormData();
-		fd_lblServerActiveSessions.right = new FormAttachment(0, 149);
-		fd_lblServerActiveSessions.top = new FormAttachment(0, 53);
-		fd_lblServerActiveSessions.left = new FormAttachment(0, 92);
-		lblServerActiveSessions.setLayoutData(fd_lblServerActiveSessions);
 		lblServerActiveSessions.setText((String) null);
 
 		Label lbl5 = new Label(grpServerDetails, SWT.NONE);
-		FormData fd_lbl5 = new FormData();
-		fd_lbl5.right = new FormAttachment(0, 86);
-		fd_lbl5.top = new FormAttachment(0, 80);
-		fd_lbl5.left = new FormAttachment(0, 7);
-		lbl5.setLayoutData(fd_lbl5);
+		lbl5.setBounds(10, 95, 79, 15);
 		lbl5.setText("Total Players: ");
 
 		CLabel lblServerTotalPlayers = new CLabel(grpServerDetails, SWT.BORDER);
+		lblServerTotalPlayers.setBounds(95, 92, 57, 21);
 		lblServerTotalPlayers.setAlignment(SWT.RIGHT);
-		FormData fd_lblServerTotalPlayers = new FormData();
-		fd_lblServerTotalPlayers.right = new FormAttachment(0, 149);
-		fd_lblServerTotalPlayers.top = new FormAttachment(0, 77);
-		fd_lblServerTotalPlayers.left = new FormAttachment(0, 92);
-		lblServerTotalPlayers.setLayoutData(fd_lblServerTotalPlayers);
 		lblServerTotalPlayers.setText((String) null);
 
 		Label lbl6 = new Label(grpServerDetails, SWT.NONE);
-		FormData fd_lbl6 = new FormData();
-		fd_lbl6.right = new FormAttachment(0, 69);
-		fd_lbl6.top = new FormAttachment(0, 32);
-		fd_lbl6.left = new FormAttachment(0, 7);
-		lbl6.setLayoutData(fd_lbl6);
+		lbl6.setBounds(10, 47, 62, 15);
 		lbl6.setText("HTTP Port: ");
 
 		lblHttpPort = new CLabel(grpServerDetails, SWT.BORDER);
+		lblHttpPort.setBounds(78, 44, 74, 21);
 		lblHttpPort.setAlignment(SWT.RIGHT);
-		FormData fd_lblHttpPort = new FormData();
-		fd_lblHttpPort.right = new FormAttachment(0, 149);
-		fd_lblHttpPort.top = new FormAttachment(0, 29);
-		fd_lblHttpPort.left = new FormAttachment(0, 75);
-		lblHttpPort.setLayoutData(fd_lblHttpPort);
 		lblHttpPort.setText(UserPreferences.ServerHttpPort);
 		
 		if (UserPreferences.AutoLogin && (!ServerData.Email.isEmpty() & !ServerData.PasswordHash.isEmpty())) {
@@ -655,6 +551,9 @@ public class LoginScreen extends Shell {
 				saveCredentials(email, passwordHash);
 				lblStatus.setText("Status: Logged in!");
 				setEnabled(compositeNfsw, true);
+				btnLogout.setVisible(true);
+				btnLogout.setEnabled(true);
+				compositeEntrance.setEnabled(true);
 				return;
 			} else {
 				lblStatus.setText(doc.getElementsByTagName("Message").item(0).getTextContent());
