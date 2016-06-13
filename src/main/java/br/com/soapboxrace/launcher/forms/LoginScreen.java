@@ -309,12 +309,13 @@ public class LoginScreen extends Shell {
 						dialog.setFilterExtensions(new String[] { "*.exe" });
 						dialog.setFilterPath("C:\\ProgramData\\Electronic Arts\\Need for Speed World");
 						String result = dialog.open();
-						if (!result.isEmpty()) {
+						if (result != null && !result.isEmpty()) {
 							Settings.getLauncherSettings().getClientData().setPath(result);
+							Settings.getLauncherSettings().getClientData().setModuleName(dialog.getFileName());
 							saveSettings();
 							lblNfsWorldPath.setText(result);
 						} else {
-							lblStatus.setText("Error: There was a problem settings the client path.");
+							lblStatus.setText("Error: There was a problem setting the client path.");
 						}
 					}
 				});
@@ -330,6 +331,7 @@ public class LoginScreen extends Shell {
 			public void mouseUp(MouseEvent arg0) {
 				try {
 					LauncherSettingsType lDelegate = Settings.getLauncherSettings();
+					if (lDelegate.getClientData().getPath() != null)
 					if (!lDelegate.getClientData().getPath().isEmpty()) {
 						new ProcessBuilder(lDelegate.getClientData().getPath(), "THANKSOBAMA",
 								new URL(lDelegate.getServerData().getLiteralURL(), "nfsw/Engine.svc").toString(),
