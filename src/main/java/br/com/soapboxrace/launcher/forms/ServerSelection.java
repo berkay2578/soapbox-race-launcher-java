@@ -109,8 +109,8 @@ public class ServerSelection extends Dialog {
 		listServer.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				System.out.println(listServer.getSelection()[0]);
-				btnSelect.setEnabled(true);
+				if (listServer.getSelection().length > 0)
+					btnSelect.setEnabled(true);
 			}
 		});
 		listServer.setItems(new String[] {});
