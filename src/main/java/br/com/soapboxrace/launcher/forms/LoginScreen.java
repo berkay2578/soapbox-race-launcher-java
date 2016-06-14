@@ -47,6 +47,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import br.com.soapboxrace.launcher.definition.AuthType;
 import br.com.soapboxrace.launcher.jaxb.LauncherSettingsType;
 import br.com.soapboxrace.launcher.jaxb.LoginDataType;
 import br.com.soapboxrace.launcher.jaxb.ServerDataType;
@@ -217,7 +218,7 @@ public class LoginScreen extends Shell {
 			public void mouseUp(MouseEvent arg0) {
 				BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
 					public void run() {
-						doLogin(txtEmail.getText(), DigestUtils.sha1Hex(txtPassword.getText()));
+						doAuth(txtEmail.getText(), DigestUtils.sha1Hex(txtPassword.getText()), AuthType.LoginAuth);
 					}
 				});
 			}
@@ -236,7 +237,7 @@ public class LoginScreen extends Shell {
 			public void mouseUp(MouseEvent arg0) {
 				BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
 					public void run() {
-						doRegister(txtEmail.getText(), DigestUtils.sha1Hex(txtPassword.getText()));
+						doAuth(txtEmail.getText(), DigestUtils.sha1Hex(txtPassword.getText()), AuthType.RegisterAuth);
 					}
 				});
 			}
@@ -398,7 +399,7 @@ public class LoginScreen extends Shell {
 				if (!lDelegate.getEmail().isEmpty() & !lDelegate.getPasswordHash().isEmpty()) {
 					txtEmail.setText(lDelegate.getEmail());
 					txtPassword.setText("");
-					doLogin(lDelegate.getEmail(), lDelegate.getPasswordHash());
+					doAuth(lDelegate.getEmail(), lDelegate.getPasswordHash(), AuthType.LoginAuth);
 				}
 			}
 		}
@@ -437,9 +438,13 @@ public class LoginScreen extends Shell {
 		}
 	}
 
-	private void doLogin(String email, String passwordHash) {
+	private void doAuth(String email, String passwordHash, AuthType auth) {
 		try {
-			lblStatus.setText("Status: Logging in...");
+			String statusFirst = auth == AuthType.LoginAuth ? "Logging in" : "Registering email".concat(email);
+			String statusLast = auth == AuthType.LoginAuth ? "Logged in" : "Registered and logged in";
+			String urlFolder = auth == AuthType.LoginAuth ? "AuthenticateUser" : "CreateUser";
+			
+			lblStatus.setText(String.format("Status: %s.", statusFirst));
 			setEnabled(compositeEntrance, false);
 			userId = null;
 			loginToken = null;
@@ -452,7 +457,7 @@ public class LoginScreen extends Shell {
 					URLEncoder.encode(passwordHash, StandardCharsets.UTF_8.toString()));
 
 			URL serverAuth = new URL(Settings.getLauncherSettings().getServerData().getLiteralURL(),
-					"nfsw/Engine.svc/User/AuthenticateUser".concat(param));
+					String.format("nfsw/Engine.svc/User/%s%s", urlFolder, param));
 
 			HttpURLConnection serverCon = (HttpURLConnection) serverAuth.openConnection();
 			serverCon.setRequestMethod("GET");
@@ -475,7 +480,7 @@ public class LoginScreen extends Shell {
 				Settings.getLauncherSettings().getServerData().getLoginData().setEmail(email);
 				Settings.getLauncherSettings().getServerData().getLoginData().setPasswordHash(passwordHash);
 				saveSettings();
-				lblStatus.setText("Status: Logged in!");
+				lblStatus.setText(String.format("Status: %s!", statusLast));
 				setEnabled(compositeNfsw, true);
 				btnLogout.setVisible(true);
 				btnLogout.setEnabled(true);
@@ -484,69 +489,6 @@ public class LoginScreen extends Shell {
 			} else {
 				lblStatus.setText(doc.getElementsByTagName("Message").item(0).getTextContent());
 			}
-		} catch (UnsupportedEncodingException e) {
-			lblStatus.setText("Environment Error: Couldn't encode URL to UTF-8.");
-		} catch (MalformedURLException e) {
-			lblStatus.setText("Connection Error: Server URL is malformed.");
-		} catch (ConnectException e) {
-			lblStatus.setText("Connection Error: Couldn't connect to the server.");
-		} catch (ProtocolException e) {
-			lblStatus.setText("Connection Error: Couldn't setup GET request.");
-		} catch (UnknownHostException e) {
-			lblStatus.setText("Connection Error: Current server isn't running.");
-		} catch (SAXException | ParserConfigurationException e) {
-			lblStatus.setText("Login Error: Invalid response data.");
-		} catch (IOException e) {
-			e.printStackTrace();
-			lblStatus.setText(String.format("Error: %s.", e.getCause().getLocalizedMessage()));
-		}
-		setEnabled(compositeEntrance, true);
-	}
-
-	private void doRegister(String email, String passwordHash) {
-		try {
-			lblStatus.setText("Status: Registering email ".concat(txtEmail.getText()));
-			setEnabled(compositeEntrance, false);
-			userId = null;
-			loginToken = null;
-
-			DocumentBuilderFactory dcFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder dcBuilder = dcFactory.newDocumentBuilder();
-
-			String param = String.format("?email=%s&password=%s",
-					URLEncoder.encode(email, StandardCharsets.UTF_8.toString()),
-					URLEncoder.encode(passwordHash, StandardCharsets.UTF_8.toString()));
-
-			URL serverAuth = new URL(Settings.getLauncherSettings().getServerData().getLiteralURL(),
-					"nfsw/Engine.svc/User/CreateUser".concat(param));
-			HttpURLConnection serverCon = (HttpURLConnection) serverAuth.openConnection();
-			serverCon.setRequestMethod("GET");
-
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					serverCon.getResponseCode() == 200 ? serverCon.getInputStream() : serverCon.getErrorStream()));
-			String inputLine;
-			StringBuffer response = new StringBuffer();
-
-			while ((inputLine = in.readLine()) != null) {
-				response.append(inputLine);
-			}
-			in.close();
-
-			Document doc = dcBuilder.parse(new InputSource(new StringReader(response.toString())));
-
-			if (serverCon.getResponseCode() == 200) {
-				userId = doc.getElementsByTagName("UserId").item(0).getTextContent();
-				loginToken = doc.getElementsByTagName("LoginToken").item(0).getTextContent();
-				Settings.getLauncherSettings().getServerData().getLoginData().setEmail(email);
-				Settings.getLauncherSettings().getServerData().getLoginData().setPasswordHash(passwordHash);
-				saveSettings();
-				lblStatus.setText("Status: Registered and logged in!");
-				setEnabled(compositeNfsw, true);
-				return;
-			} else {
-				lblStatus.setText(doc.getElementsByTagName("Message").item(0).getTextContent());
-			}
-
 		} catch (UnsupportedEncodingException e) {
 			lblStatus.setText("Environment Error: Couldn't encode URL to UTF-8.");
 		} catch (MalformedURLException e) {
