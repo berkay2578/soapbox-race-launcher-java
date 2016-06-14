@@ -48,6 +48,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import br.com.soapboxrace.launcher.jaxb.LauncherSettingsType;
+import br.com.soapboxrace.launcher.jaxb.LoginDataType;
 import br.com.soapboxrace.launcher.jaxb.ServerDataType;
 import br.com.soapboxrace.launcher.jaxb.util.MarshalUtil;
 import br.com.soapboxrace.launcher.variables.Settings;
@@ -332,15 +333,16 @@ public class LoginScreen extends Shell {
 				try {
 					LauncherSettingsType lDelegate = Settings.getLauncherSettings();
 					if (lDelegate.getClientData().getPath() != null)
-					if (!lDelegate.getClientData().getPath().isEmpty()) {
-						new ProcessBuilder(lDelegate.getClientData().getPath(), "THANKSOBAMA",
-								new URL(lDelegate.getServerData().getLiteralURL(), "nfsw/Engine.svc").toString(),
-								loginToken, userId).start();
-						// I'm not managing this shit, ain't nobody got time for
-						// that.
-						lblStatus.setText("Status: NFS World launched successfully!");
-					} else
-						lblStatus.setText("Launch Error: NFS World path is null.");
+						if (!lDelegate.getClientData().getPath().isEmpty()) {
+							new ProcessBuilder(lDelegate.getClientData().getPath(), "THANKSOBAMA",
+									new URL(lDelegate.getServerData().getLiteralURL(), "nfsw/Engine.svc").toString(),
+									loginToken, userId).start();
+							// I'm not managing this shit, ain't nobody got time
+							// for
+							// that.
+							lblStatus.setText("Status: NFS World launched successfully!");
+						} else
+							lblStatus.setText("Launch Error: NFS World path is null.");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -391,14 +393,12 @@ public class LoginScreen extends Shell {
 		lblHttpPort.setText(loadDelegate.getServerData().getHttpPort().toString());
 
 		if (loadDelegate.getPreferences().isAutoLogin()) {
-			if (loadDelegate.getServerData().getLoginData().getEmail() != null
-					& loadDelegate.getServerData().getLoginData().getPasswordHash() != null) {
-				if (!loadDelegate.getServerData().getLoginData().getEmail().isEmpty()
-						& !loadDelegate.getServerData().getLoginData().getPasswordHash().isEmpty()) {
-					txtEmail.setText(loadDelegate.getServerData().getLoginData().getEmail());
+			LoginDataType lDelegate = loadDelegate.getServerData().getLoginData();
+			if (lDelegate.getEmail() != null & lDelegate.getPasswordHash() != null) {
+				if (!lDelegate.getEmail().isEmpty() & !lDelegate.getPasswordHash().isEmpty()) {
+					txtEmail.setText(lDelegate.getEmail());
 					txtPassword.setText("");
-					doLogin(loadDelegate.getServerData().getLoginData().getEmail(),
-							loadDelegate.getServerData().getLoginData().getPasswordHash());
+					doLogin(lDelegate.getEmail(), lDelegate.getPasswordHash());
 				}
 			}
 		}
