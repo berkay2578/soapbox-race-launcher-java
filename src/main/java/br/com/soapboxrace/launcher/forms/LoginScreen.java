@@ -14,6 +14,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.util.zip.GZIPInputStream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -462,8 +463,8 @@ public class LoginScreen extends Shell {
 			HttpURLConnection serverCon = (HttpURLConnection) serverAuth.openConnection();
 			serverCon.setRequestMethod("GET");
 
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					serverCon.getResponseCode() == 200 ? serverCon.getInputStream() : serverCon.getErrorStream()));
+			BufferedReader in = new BufferedReader(new InputStreamReader(new GZIPInputStream(
+					serverCon.getResponseCode() == 200 ? serverCon.getInputStream() : serverCon.getErrorStream())));
 			String inputLine;
 			StringBuffer response = new StringBuffer();
 
